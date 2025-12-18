@@ -104,44 +104,65 @@
         .top-title { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
         .top-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 12px;
+            grid-template-columns: repeat(3, 1fr); /* 3 cột cố định trên mobile */
+            gap: 10px;
+        }
+        @media (min-width: 500px) {
+            .top-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+        @media (min-width: 700px) {
+            .top-grid { grid-template-columns: repeat(5, 1fr); }
         }
         .top-card {
             background: #1a1a1a;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s;
         }
         .top-card:hover { transform: scale(1.03); }
+        .top-card-wrapper { position: relative; }
         .top-card-img {
             width: 100%;
             aspect-ratio: 3/4;
             object-fit: cover;
             background: #222;
+            display: block;
+        }
+        /* No Pic placeholder */
+        .top-card-nopic {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 11px;
+            font-weight: 500;
         }
         .top-card-rank {
             position: absolute;
-            top: 6px; left: 6px;
+            top: 4px; left: 4px;
             background: #ee4d2d;
             color: #fff;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
-            padding: 2px 7px;
+            padding: 2px 6px;
             border-radius: 4px;
         }
-        .top-card-wrapper { position: relative; }
         .top-card-name {
-            padding: 8px 6px;
-            font-size: 12px;
-            color: #ddd;
-            line-height: 1.3;
+            padding: 6px 4px;
+            font-size: 11px;
+            color: #ccc;
+            line-height: 1.25;
             text-align: center;
+            height: 36px; /* Cố định chiều cao = 2 dòng */
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* === LINK BUTTONS === */
@@ -384,17 +405,30 @@ function renderTopMovies() {
         var wrapper = document.createElement('div');
         wrapper.className = 'top-card-wrapper';
 
-        var img = document.createElement('img');
-        img.className = 'top-card-img';
-        img.src = item.poster || 'https://via.placeholder.com/150x200?text=No+Image';
-        img.alt = item.name;
-        img.onerror = function() { this.src = 'https://via.placeholder.com/150x200?text=No+Image'; };
+        // Nếu có poster thì hiện ảnh, không thì hiện "No Pic"
+        if (item.poster && item.poster.trim()) {
+            var img = document.createElement('img');
+            img.className = 'top-card-img';
+            img.src = item.poster;
+            img.alt = item.name;
+            img.onerror = function() {
+                // Nếu ảnh lỗi thì thay bằng No Pic
+                var nopic = document.createElement('div');
+                nopic.className = 'top-card-nopic';
+                nopic.textContent = 'No Pic';
+                this.parentNode.replaceChild(nopic, this);
+            };
+            wrapper.appendChild(img);
+        } else {
+            var nopic = document.createElement('div');
+            nopic.className = 'top-card-nopic';
+            nopic.textContent = 'No Pic';
+            wrapper.appendChild(nopic);
+        }
 
         var rankBadge = document.createElement('div');
         rankBadge.className = 'top-card-rank';
         rankBadge.textContent = 'TOP ' + item.rank;
-
-        wrapper.appendChild(img);
         wrapper.appendChild(rankBadge);
 
         var nameDiv = document.createElement('div');
