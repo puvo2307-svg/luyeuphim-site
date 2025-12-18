@@ -213,6 +213,12 @@
 
 <!-- ========== CHẶN PC ========== -->
 <div id="pc-blocked">
+    <!-- Dải phim đề xuất chỉ để xem, không click, không mở Shopee -->
+    <div id="top-section-pc" class="top-section" style="max-width: 900px; width: 100%; margin-bottom: 24px;">
+        <div class="top-title">📺 Phim đề xuất (chỉ hiển thị tham khảo)</div>
+        <div id="top-grid-pc" class="top-grid" style="cursor: default;"></div>
+    </div>
+
     <h1>⚠️ THÔNG BÁO</h1>
     <p>Nội dung này hiện chỉ hỗ trợ xem trên <strong>Thiết bị di động (Mobile)</strong>.</p>
     <div style="margin-top: 20px; color: #555;">(Hỗ trợ: Android, iPhone, iPad)</div>
@@ -385,11 +391,15 @@ function loadMoviesFromSheet() {
 
 // ========== HIỂN THỊ TOP PHIM (ẢNH BÌA) ==========
 function renderTopMovies() {
+    // Mobile
     var section = document.getElementById('top-section');
     var gridEl = document.getElementById('top-grid');
-    if (!section || !gridEl) return;
+    // PC (chỉ hiển thị, không click)
+    var pcSection = document.getElementById('top-section-pc');
+    var pcGrid = document.getElementById('top-grid-pc');
 
-    gridEl.innerHTML = "";
+    if (gridEl) gridEl.innerHTML = "";
+    if (pcGrid) pcGrid.innerHTML = "";
 
     var entries = [];
     Object.keys(movieIndex).forEach(function(name) {
@@ -401,14 +411,18 @@ function renderTopMovies() {
     entries.sort(function(a, b) { return a.rank - b.rank; });
 
     if (!entries.length) {
-        section.style.display = "none";
+        if (section) section.style.display = "none";
+        if (pcSection) pcSection.style.display = "none";
         return;
     }
 
-    entries.forEach(function(item) {
+    // Helper tạo card
+    function createCard(item, clickable) {
         var card = document.createElement('div');
         card.className = 'top-card';
-        card.onclick = function() { loadMovieByName(item.name); };
+        if (clickable) {
+            card.onclick = function() { loadMovieByName(item.name); };
+        }
 
         var wrapper = document.createElement('div');
         wrapper.className = 'top-card-wrapper';
@@ -445,10 +459,20 @@ function renderTopMovies() {
 
         card.appendChild(wrapper);
         card.appendChild(nameDiv);
-        gridEl.appendChild(card);
+        return card;
+    }
+
+    entries.forEach(function(item) {
+        if (gridEl) {
+            gridEl.appendChild(createCard(item, true));   // mobile: có click
+        }
+        if (pcGrid) {
+            pcGrid.appendChild(createCard(item, false));  // PC: chỉ xem
+        }
     });
 
-    section.style.display = "block";
+    if (section) section.style.display = "block";
+    if (pcSection) pcSection.style.display = "block";
 }
 
 // ========== TÌM KIẾM ==========
