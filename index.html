@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trình phát phim - Lu Yêu Phim</title>
+    <title>Lu Yêu Phim – Trang thông tin / tổng hợp liên kết</title>
     <style>
         body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background: #121212; color: white; padding: 15px; margin: 0; }
         
-        /* Thông báo cấm PC */
+        /* Thông báo cấm PC (hiện nhưng đã tắt bằng JS nếu muốn) */
         #pc-blocked {
-            display: none; /* Mặc định ẩn, hiện ra nếu là PC */
+            display: none; /* JS sẽ set lại nếu cần, hiện tại checkDevice() tắt luôn */
             height: 100vh;
             flex-direction: column;
             justify-content: center;
@@ -20,7 +20,7 @@
 
         /* Nội dung chính */
         #mobile-content {
-            display: none; /* Mặc định ẩn, hiện ra nếu là Mobile */
+            display: none; /* JS bật lên cho mọi thiết bị */
             max-width: 900px;
             margin: 0 auto;
         }
@@ -38,7 +38,7 @@
         }
         iframe { width: 100%; height: 100%; border: none; }
         
-        /* Overlay - Lớp phủ */
+        /* Overlay - Lớp phủ Shopee */
         #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.92);
@@ -205,26 +205,11 @@
             color: #aaa;
             line-height: 1.4;
         }
-        /* Nút Shopee bên ngoài (không che player) */
-        .shopee-cta {
-            margin: 12px 0 4px 0;
-            display: inline-block;
-            background: #ee4d2d;
-            color: #fff;
-            padding: 10px 18px;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
-        }
-        .shopee-cta:hover {
-            background: #ff6a3a;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Màn hình chặn PC -->
+    <!-- Màn hình chặn PC (hiện tại JS tắt đi) -->
     <div id="pc-blocked">
         <h1>⚠️ THÔNG BÁO</h1>
         <p>Nội dung này hiện chỉ hỗ trợ xem trên <strong>Thiết bị di động (Mobile)</strong>.</p>
@@ -248,9 +233,9 @@
         </div>
     </div>
 
-    <!-- Màn hình nội dung cho Mobile -->
+    <!-- Màn hình nội dung chính -->
     <div id="mobile-content">
-        <!-- Tìm kiếm phim theo "Tên Phim Việt" trong Google Sheet -->
+        <!-- Tìm kiếm phim -->
         <div class="search-container">
             <div class="search-title">Tìm phim theo tên tiếng Việt</div>
             <div class="search-desc">
@@ -276,8 +261,8 @@
             </iframe>
         </div>
 
+        <!-- Danh sách tập mặc định (sẽ được thay bằng dữ liệu từ Sheet khi chọn phim) -->
         <div class="episode-list">
-            <!-- Khớp với dữ liệu Sheet của bạn -->
             <div class="ep-item active" onclick="changeEpisode(1, 'x9vxtfe')">Tập 1</div>
             <div class="ep-item" onclick="changeEpisode(2, 'x9vxtfg')">Tập 2</div>
             <div class="ep-item uploading">Tập 3 (đang upload)</div>
@@ -288,7 +273,6 @@
             <div class="ep-item" onclick="changeEpisode(8, 'x9vxtfw')">Tập 8</div>
             <div class="ep-item" onclick="changeEpisode(9, 'x9vxtfy')">Tập 9</div>
             <div class="ep-item" onclick="changeEpisode(10, 'x9vxtfc')">Tập 10</div>
-            
             <div class="ep-item uploading">Tập 11 (đang upload)</div>
             <div class="ep-item uploading">Tập 12 (đang upload)</div>
             <div class="ep-item uploading">Tập 13 (đang upload)</div>
@@ -297,7 +281,7 @@
             <div class="ep-item uploading">Tập 16 (Cuối)</div>
         </div>
 
-        <!-- Các nút liên kết cộng đồng (Mobile dưới phần tập phim) -->
+        <!-- Nút cộng đồng dưới player -->
         <div class="link-buttons">
             <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">
                 Tham gia nhóm Fanpage
@@ -342,7 +326,7 @@
 <script>
     // --- LOGIC KIỂM TRA THIẾT BỊ ---
     function checkDevice() {
-        // Luôn cho phép xem giao diện chính trên mọi thiết bị (PC, Mobile, Tablet)
+        // Cho phép xem giao diện chính trên mọi thiết bị (PC, mobile, tablet)
         var mobileContent = document.getElementById('mobile-content');
         var pcBlocked = document.getElementById('pc-blocked');
         if (mobileContent) mobileContent.style.display = 'block';
@@ -350,26 +334,21 @@
     }
     checkDevice();
 
-    // --- LOAD DỮ LIỆU PHIM TỪ GOOGLE SHEET (đọc "Tên Phim Việt") ---
-    // Endpoint JSON của Sheet: ID=1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w, Sheet4
-    // Nếu sau này bạn đổi ID hoặc Sheet Name, chỉ cần sửa URL này.
+    // --- LOAD DỮ LIỆU PHIM TỪ GOOGLE SHEET ---
     const SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w/gviz/tq?tqx=out:json&sheet=Sheet4";
-
-    // movieIndex: { tenPhimViet: { episodes: [ {ep, embedUrl} ] } }
     const movieIndex = {};
 
     async function loadMoviesFromSheet() {
         try {
             const res = await fetch(SHEET_JSON_URL);
             const text = await res.text();
-            // Gỡ wrapper "google.visualization.Query.setResponse(...)"
             const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
             const data = JSON.parse(jsonStr);
             const rows = data.table.rows || [];
 
-            rows.forEach((row, idx) => {
+            rows.forEach((row) => {
                 const cells = row.c || [];
-                // Cột: 0 Tên Bộ Phim, 1 Số Tập, 2 Link DM, 3 Embed URL, 4 ID Kênh, 5 Ngày, 6 Tên Phim Việt
+                // A: Tên Bộ Phim, B: Số Tập, C: Link DM, D: Embed URL, E: ID Kênh, F: Ngày, G: Tên Phim Việt
                 const tenPhimViet = (cells[6] && cells[6].v) ? String(cells[6].v).trim() : "";
                 const ep = cells[1] && cells[1].v != null ? Number(cells[1].v) : null;
                 const embedUrl = cells[3] && cells[3].v ? String(cells[3].v).trim() : "";
@@ -382,7 +361,6 @@
                 movieIndex[tenPhimViet].episodes.push({ ep, embedUrl });
             });
 
-            // Sắp xếp tập trong từng bộ
             Object.values(movieIndex).forEach(m => {
                 m.episodes.sort((a, b) => a.ep - b.ep);
             });
@@ -434,10 +412,8 @@
         const epList = document.querySelector('.episode-list');
         if (!epList) return;
 
-        // Xoá danh sách tập cũ
         epList.innerHTML = "";
 
-        // Tạo lại danh sách tập theo dữ liệu sheet
         episodes.forEach(item => {
             const div = document.createElement('div');
             div.className = 'ep-item';
@@ -448,12 +424,10 @@
             epList.appendChild(div);
         });
 
-        // Auto chọn tập 1
         const first = episodes[0];
         changeEpisode(first.ep, first.embedUrl, name, epList.firstChild);
     }
 
-    // Khởi tạo search input
     document.addEventListener('DOMContentLoaded', () => {
         const input = document.getElementById('search-input');
         if (input) {
@@ -467,7 +441,8 @@
 
     function handlePlay() {
         window.open(myShopeeLink, '_blank');
-        document.getElementById('overlay').style.display = 'none';
+        var overlay = document.getElementById('overlay');
+        if (overlay) overlay.style.display = 'none';
     }
 
     function showDonateInfo() {
@@ -478,9 +453,7 @@
     }
 
     function hideDonateInfo(evt) {
-        // Nếu click ra ngoài hộp modal hoặc nút "Đã hiểu" thì đóng
         if (evt && evt.target && !evt.target.classList.contains('donate-modal-backdrop') && evt.target.closest('.donate-modal') !== null) {
-            // click bên trong modal, nhưng không phải nút close → không làm gì
             if (!evt.target.classList.contains('donate-modal-close')) {
                 return;
             }
@@ -492,20 +465,19 @@
     }
 
     function changeEpisode(epNum, source, filmNameOverride, clickedEl) {
-        // Mỗi tập mới đều hiển thị lại overlay Shopee,
-        // người xem bấm nút thì overlay mới biến mất.
         var overlay = document.getElementById('overlay');
         if (overlay) overlay.style.display = 'flex';
+
         var player = document.getElementById('video-player');
         var src = String(source || "");
         if (!src.startsWith("http")) {
-            src = "https://geo.dailymotion.com/player.html?video=" + src;
+            src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=0&mute=1";
         }
         player.src = src;
-        
+
         var displayTitle = "Tập " + epNum;
         if(epNum == 16) displayTitle += " (Cuối)";
-        var filmName = filmNameOverride || "Phim Của Bạn";
+        var filmName = filmNameOverride || "Tên Phim Của Bạn";
         document.getElementById('film-title').innerText = displayTitle + " - " + filmName;
         
         var eps = document.getElementsByClassName('ep-item');
