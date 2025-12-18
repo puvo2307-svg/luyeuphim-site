@@ -284,6 +284,7 @@
                 <button class="btn-shopee-main">🛒 MỞ SHOPEE & QUAY LẠI XEM FULL</button>
                 <p class="text-note">(Xin lỗi nếu overlay xuất hiện nhiều; đây là một phần chi phí duy trì kênh. App Shopee sẽ mở ở tab mới, bạn có thể quay lại đây sau khi hoàn tất.)</p>
             </div>
+            <!-- autoplay mặc định =1, tắt overlay để người dùng chủ động Play nếu muốn -->
             <iframe id="video-player" src="" allow="fullscreen" allowfullscreen></iframe>
         </div>
 
@@ -680,7 +681,8 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId) {
     var player = document.getElementById('video-player');
     var src = String(source || "");
     if (!src.startsWith("http")) {
-        src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=0&mute=1";
+        // Bật autoplay (mute=1 để tương thích mobile)
+        src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
     }
     player.src = src;
 
