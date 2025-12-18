@@ -289,8 +289,30 @@
             <div id="top-list" class="top-list"></div>
         </div>
 
+        <!-- Nút cộng đồng + donate: luôn hiển thị -->
+        <div class="link-buttons">
+            <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">
+                Tham gia nhóm Fanpage
+            </a>
+            <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">
+                Theo dõi &amp; nhấn chuông YTB
+            </a>
+            <button class="link-btn-primary link-btn" onclick="showDonateInfo()">
+                Donate duy trì kênh
+            </button>
+        </div>
+
+        <div class="donate-box">
+            <div class="donate-text-title">Ủng hộ chi phí duy trì kênh</div>
+            <div class="donate-text-sub">
+                Ngân hàng: <strong>LE THI TUYET HOA</strong><br>
+                Số tài khoản: <strong>9323082004</strong><br>
+                Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+            </div>
+        </div>
+
         <!-- Khu vực xem phim, mặc định ẩn cho tới khi chọn phim -->
-        <div id="movie-section" style="display:none;">
+        <div id="movie-section" style="display:none; margin-top: 16px;">
         <h2 id="film-title" style="font-size: 20px;">Tập 1 - Tên Phim Của Bạn</h2>
 
         <div class="player-container">
@@ -327,28 +349,6 @@
             <div class="ep-item uploading">Tập 16 (Cuối)</div>
         </div>
 
-        <!-- Nút cộng đồng dưới player -->
-        <div class="link-buttons">
-            <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">
-                Tham gia nhóm Fanpage
-            </a>
-            <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">
-                Theo dõi &amp; nhấn chuông YTB
-            </a>
-            <button class="link-btn-primary link-btn" onclick="showDonateInfo()">
-                Donate duy trì kênh
-            </button>
-        </div>
-
-        <!-- Khung donate duy trì kênh -->
-        <div class="donate-box">
-            <div class="donate-text-title">Ủng hộ chi phí duy trì kênh</div>
-            <div class="donate-text-sub">
-                Ngân hàng: <strong>LE THI TUYET HOA</strong><br>
-                Số tài khoản: <strong>9323082004</strong><br>
-                Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
-            </div>
-        </div>
         <!-- Ghi chú miễn trừ trách nhiệm (Mobile) -->
         <div style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
             <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
@@ -384,6 +384,16 @@
     // --- LOAD DỮ LIỆU PHIM TỪ GOOGLE SHEET ---
     const SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w/gviz/tq?tqx=out:json&sheet=Sheet4";
     const movieIndex = {};
+
+    // Chuẩn hoá chuỗi để tìm kiếm: bỏ dấu, khoảng trắng dư, lower-case
+    function normalizeText(str) {
+        return String(str)
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // bỏ dấu tiếng Việt
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
 
     async function loadMoviesFromSheet() {
         try {
@@ -464,16 +474,17 @@
         const box = document.getElementById('search-results');
         if (!box) return;
 
-        const q = keyword.trim().toLowerCase();
+        const qNorm = normalizeText(keyword);
         box.innerHTML = "";
-        if (!q) {
+        if (!qNorm) {
             box.style.display = "none";
             return;
         }
 
-        const names = Object.keys(movieIndex).filter(name =>
-            name.toLowerCase().includes(q)
-        );
+        const names = Object.keys(movieIndex).filter(name => {
+            const nNorm = normalizeText(name);
+            return nNorm.includes(qNorm);
+        });
 
         if (!names.length) {
             box.innerHTML = '<div class="search-result-item">Không tìm thấy phim phù hợp.</div>';
