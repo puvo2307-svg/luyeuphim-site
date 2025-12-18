@@ -120,6 +120,42 @@
             background: #262626;
         }
 
+        /* Danh sách phim TOP */
+        .top-section {
+            margin-top: 12px;
+            text-align: left;
+        }
+        .top-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .top-list {
+            background: #181818;
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 6px 0;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+        .top-item {
+            padding: 6px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 1px solid #222;
+        }
+        .top-item:last-child {
+            border-bottom: none;
+        }
+        .top-item span.rank {
+            color: #f1c40f;
+            font-weight: 600;
+            margin-right: 6px;
+        }
+        .top-item:hover {
+            background: #262626;
+        }
+
         /* Nút liên kết dưới thông báo / dưới player */
         .link-buttons {
             margin-top: 16px;
@@ -247,6 +283,14 @@
             <div id="search-results" class="search-results" style="display:none;"></div>
         </div>
 
+        <!-- Danh sách phim TOP -->
+        <div id="top-section" class="top-section" style="display:none;">
+            <div class="top-title">Phim đề xuất</div>
+            <div id="top-list" class="top-list"></div>
+        </div>
+
+        <!-- Khu vực xem phim, mặc định ẩn cho tới khi chọn phim -->
+        <div id="movie-section" style="display:none;">
         <h2 id="film-title" style="font-size: 20px;">Tập 1 - Tên Phim Của Bạn</h2>
 
         <div class="player-container">
@@ -309,6 +353,7 @@
         <div style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
             <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
         </div>
+        </div> <!-- end #movie-section -->
     </div>
 
 <!-- Modal donate -->
@@ -354,21 +399,65 @@
                 const tenPhimViet = (cells[6] && cells[6].v) ? String(cells[6].v).trim() : "";
                 const ep = cells[1] && cells[1].v != null ? Number(cells[1].v) : null;
                 const embedUrl = cells[3] && cells[3].v ? String(cells[3].v).trim() : "";
+                const topRaw = cells[7] && cells[7].v != null ? Number(cells[7].v) : null; // Cột H: TOP
 
                 if (!tenPhimViet || !embedUrl || ep == null) return;
 
                 if (!movieIndex[tenPhimViet]) {
-                    movieIndex[tenPhimViet] = { episodes: [] };
+                    movieIndex[tenPhimViet] = { episodes: [], topRank: null };
                 }
                 movieIndex[tenPhimViet].episodes.push({ ep, embedUrl });
+
+                if (topRaw != null && !isNaN(topRaw)) {
+                    const current = movieIndex[tenPhimViet].topRank;
+                    movieIndex[tenPhimViet].topRank = current == null ? topRaw : Math.min(current, topRaw);
+                }
             });
 
             Object.values(movieIndex).forEach(m => {
                 m.episodes.sort((a, b) => a.ep - b.ep);
             });
+            renderTopMovies();
         } catch (e) {
             console.error("Lỗi khi load dữ liệu từ Google Sheet:", e);
         }
+    }
+
+    // Hiển thị danh sách phim TOP từ cột H (TOP)
+    function renderTopMovies() {
+        const section = document.getElementById('top-section');
+        const listEl = document.getElementById('top-list');
+        if (!section || !listEl) return;
+
+        listEl.innerHTML = "";
+
+        const entries = Object.entries(movieIndex)
+            .filter(([name, data]) => data.topRank != null)
+            .sort((a, b) => a[1].topRank - b[1].topRank);
+
+        if (!entries.length) {
+            section.style.display = "none";
+            return;
+        }
+
+        entries.forEach(([name, data]) => {
+            const div = document.createElement('div');
+            div.className = 'top-item';
+            div.onclick = () => loadMovieByName(name);
+
+            const spanRank = document.createElement('span');
+            spanRank.className = 'rank';
+            spanRank.textContent = data.topRank + '.';
+
+            const spanName = document.createElement('span');
+            spanName.textContent = name;
+
+            div.appendChild(spanRank);
+            div.appendChild(spanName);
+            listEl.appendChild(div);
+        });
+
+        section.style.display = "block";
     }
 
     function renderSearchResults(keyword) {
@@ -427,6 +516,8 @@
         });
 
         const first = episodes[0];
+        const movieSection = document.getElementById('movie-section');
+        if (movieSection) movieSection.style.display = 'block';
         changeEpisode(first.ep, first.embedUrl, name, epList.firstChild);
     }
 
