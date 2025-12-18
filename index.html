@@ -99,26 +99,35 @@
         .search-result-item:last-child { border-bottom: none; }
         .search-result-item:hover { background: #262626; }
 
-        /* === TOP PHIM (POSTER GRID) === */
+        /* === TOP PHIM (CUỘN NGANG) === */
         .top-section { margin-top: 18px; text-align: left; }
         .top-title { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
         .top-grid {
             display: flex;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             gap: 10px;
-            justify-content: flex-start;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 8px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
         }
+        /* Ẩn thanh cuộn nhưng vẫn cuộn được */
+        .top-grid::-webkit-scrollbar { height: 4px; }
+        .top-grid::-webkit-scrollbar-track { background: #222; border-radius: 4px; }
+        .top-grid::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
         .top-card {
-            width: calc(33.33% - 7px); /* 3 cột mobile */
-            max-width: 120px;
+            flex: 0 0 100px; /* Chiều rộng cố định 100px */
+            min-width: 100px;
             background: #1a1a1a;
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s;
+            scroll-snap-align: start;
         }
         @media (min-width: 500px) {
-            .top-card { width: calc(25% - 8px); max-width: 130px; }
+            .top-card { flex: 0 0 110px; min-width: 110px; }
         }
         .top-card:hover { transform: scale(1.03); }
         .top-card-wrapper { position: relative; }
