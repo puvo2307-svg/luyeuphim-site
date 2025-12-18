@@ -103,22 +103,22 @@
         .top-section { margin-top: 18px; text-align: left; }
         .top-title { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
         .top-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr); /* 3 cột cố định trên mobile */
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-        }
-        @media (min-width: 500px) {
-            .top-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (min-width: 700px) {
-            .top-grid { grid-template-columns: repeat(5, 1fr); }
+            justify-content: flex-start;
         }
         .top-card {
+            width: calc(33.33% - 7px); /* 3 cột mobile */
+            max-width: 120px;
             background: #1a1a1a;
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s;
+        }
+        @media (min-width: 500px) {
+            .top-card { width: calc(25% - 8px); max-width: 130px; }
         }
         .top-card:hover { transform: scale(1.03); }
         .top-card-wrapper { position: relative; }
@@ -152,17 +152,16 @@
             border-radius: 4px;
         }
         .top-card-name {
-            padding: 6px 4px;
-            font-size: 11px;
+            padding: 5px 4px;
+            font-size: 10px;
             color: #ccc;
-            line-height: 1.25;
+            line-height: 1.3;
             text-align: center;
-            height: 36px; /* Cố định chiều cao = 2 dòng */
+            height: 30px; /* 2 dòng x 13px */
+            overflow: hidden;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
         }
 
         /* === LINK BUTTONS === */
