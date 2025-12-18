@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình phát phim - Lu Yêu Phim</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; text-align: center; background: #121212; color: white; padding: 15px; margin: 0; }
+        
+        /* Thông báo cấm PC */
+        #pc-blocked {
+            display: none; /* Mặc định ẩn, hiện ra nếu là PC */
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #pc-blocked h1 { color: #ee4d2d; }
+
+        /* Nội dung chính */
+        #mobile-content {
+            display: none; /* Mặc định ẩn, hiện ra nếu là Mobile */
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        /* Player Container */
+        .player-container { 
+            position: relative; 
+            width: 100%; 
+            background: #000;
+            aspect-ratio: 16/9;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+        
+        /* Overlay - Lớp phủ */
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 99; cursor: pointer;
+            padding: 20px; box-sizing: border-box;
+        }
+        .btn-shopee-main {
+            background: linear-gradient(135deg, #ff5722 0%, #ee4d2d 100%);
+            color: white; border: none; padding: 18px 35px;
+            font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 8px 15px rgba(238, 77, 45, 0.4);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        /* Episode List */
+        .episode-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 10px; padding: 15px;
+            background: #1e1e1e; border-radius: 15px;
+        }
+        .ep-item {
+            background: #333; color: #ccc; border: 1px solid #444;
+            padding: 12px 5px; cursor: pointer; border-radius: 8px;
+            font-weight: 500; font-size: 14px;
+        }
+        .ep-item.active { background: #ee4d2d; color: white; border-color: #ee4d2d; font-weight: bold; }
+        .ep-item.uploading { background: #222; color: #555; border: 1px dashed #444; cursor: not-allowed; }
+
+        .text-support { color: #f1c40f; font-size: 16px; margin-bottom: 15px; font-weight: 500; }
+        .text-note { color: #777; font-size: 13px; margin-top: 15px; line-height: 1.4; }
+
+        /* Ô tìm kiếm phim */
+        .search-container {
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .search-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .search-desc {
+            font-size: 13px;
+            color: #bbb;
+            margin-bottom: 8px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #1b1b1b;
+            color: #eee;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .search-results {
+            margin-top: 6px;
+            max-height: 160px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #181818;
+        }
+        .search-result-item {
+            padding: 6px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            border-bottom: 1px solid #222;
+        }
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+        .search-result-item:hover {
+            background: #262626;
+        }
+
+        /* Nút liên kết dưới thông báo / dưới player */
+        .link-buttons {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+        .link-btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid #333;
+            background: #1e1e1e;
+            color: #f5f5f5;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .link-btn:hover {
+            background: #333;
+        }
+        .link-btn-primary {
+            border-color: #ee4d2d;
+            background: #ee4d2d;
+        }
+        .link-btn-primary:hover {
+            background: #ff6a3a;
+        }
+
+        /* Popup donate đẹp hơn */
+        .donate-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .donate-modal {
+            background: #181818;
+            border-radius: 12px;
+            padding: 18px 20px;
+            border: 1px solid #333;
+            max-width: 320px;
+            width: 90%;
+            text-align: left;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            font-size: 14px;
+        }
+        .donate-modal-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #f1c40f;
+        }
+        .donate-modal-close {
+            margin-top: 14px;
+            width: 100%;
+            padding: 8px 0;
+            border-radius: 8px;
+            border: none;
+            background: #ee4d2d;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Khung donate */
+        .donate-box {
+            margin-top: 18px;
+            padding: 12px 14px;
+            background: #181818;
+            border-radius: 10px;
+            border: 1px solid #333;
+            font-size: 13px;
+            text-align: left;
+        }
+        .donate-text-title {
+            font-weight: 600;
+            color: #f1c40f;
+            margin-bottom: 4px;
+        }
+        .donate-text-sub {
+            color: #aaa;
+            line-height: 1.4;
+        }
+        /* Nút Shopee bên ngoài (không che player) */
+        .shopee-cta {
+            margin: 12px 0 4px 0;
+            display: inline-block;
+            background: #ee4d2d;
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(238, 77, 45, 0.4);
+        }
+        .shopee-cta:hover {
+            background: #ff6a3a;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Màn hình chặn PC -->
+    <div id="pc-blocked">
+        <h1>⚠️ THÔNG BÁO</h1>
+        <p>Nội dung này hiện chỉ hỗ trợ xem trên <strong>Thiết bị di động (Mobile)</strong>.</p>
+        <div style="margin-top: 20px; color: #555;">(Hỗ trợ: Android, iPhone, iPad)</div>
+
+        <!-- Các nút liên kết cộng đồng (PC) -->
+        <div class="link-buttons">
+            <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">
+                Tham gia nhóm Fanpage
+            </a>
+            <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">
+                Theo dõi &amp; nhấn chuông YTB
+            </a>
+            <button class="link-btn-primary link-btn" onclick="showDonateInfo()">
+                Donate duy trì kênh
+            </button>
+        </div>
+        <!-- Ghi chú miễn trừ trách nhiệm (PC) -->
+        <div style="max-width: 900px; margin: 20px auto 0 auto; font-size: 12px; color: #888; text-align: left; padding: 0 12px;">
+            <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
+        </div>
+    </div>
+
+    <!-- Màn hình nội dung cho Mobile -->
+    <div id="mobile-content">
+        <!-- Tìm kiếm phim theo "Tên Phim Việt" trong Google Sheet -->
+        <div class="search-container">
+            <div class="search-title">Tìm phim theo tên tiếng Việt</div>
+            <div class="search-desc">
+                Nhập <strong>tên phim</strong> giống như mô tả trên Fanpage/TikTok mà bạn đã xem. Ví dụ: <em>"Chàng Trai Xuyên Không Xây Dựng Đế Chế Bị Vợ Cắm Sừng Cướp Công Và Cái Kết Làm Chồng Nữ Đế"</em>
+            </div>
+            <input id="search-input" class="search-input" type="text" placeholder="Nhập Tên Phim Việt để tìm..." autocomplete="off" />
+            <div id="search-results" class="search-results" style="display:none;"></div>
+        </div>
+
+        <h2 id="film-title" style="font-size: 20px;">Tập 1 - Tên Phim Của Bạn</h2>
+
+        <div class="player-container">
+            <!-- Overlay Shopee che player, bấm để mở Shopee rồi xem -->
+            <div id="overlay" onclick="handlePlay()">
+                <p class="text-support">Ủng hộ chi phí duy trì và vận hành kênh Lu Yêu Phim</p>
+                <button class="btn-shopee-main">🛒 MỞ SHOPEE & XEM PHIM</button>
+                <p class="text-note">(Xin lỗi nếu overlay xuất hiện nhiều; đây là một phần chi phí duy trì kênh. App Shopee sẽ mở ở tab mới, bạn có thể quay lại đây sau khi hoàn tất.)</p>
+            </div>
+
+            <iframe id="video-player"
+                src="https://geo.dailymotion.com/player.html?video=x9vxtfe&autoplay=0&mute=1" 
+                allow="fullscreen" allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="episode-list">
+            <!-- Khớp với dữ liệu Sheet của bạn -->
+            <div class="ep-item active" onclick="changeEpisode(1, 'x9vxtfe')">Tập 1</div>
+            <div class="ep-item" onclick="changeEpisode(2, 'x9vxtfg')">Tập 2</div>
+            <div class="ep-item uploading">Tập 3 (đang upload)</div>
+            <div class="ep-item" onclick="changeEpisode(4, 'x9vxtfm')">Tập 4</div>
+            <div class="ep-item" onclick="changeEpisode(5, 'x9vxtfk')">Tập 5</div>
+            <div class="ep-item" onclick="changeEpisode(6, 'x9vxtfu')">Tập 6</div>
+            <div class="ep-item" onclick="changeEpisode(7, 'x9vxtfs')">Tập 7</div>
+            <div class="ep-item" onclick="changeEpisode(8, 'x9vxtfw')">Tập 8</div>
+            <div class="ep-item" onclick="changeEpisode(9, 'x9vxtfy')">Tập 9</div>
+            <div class="ep-item" onclick="changeEpisode(10, 'x9vxtfc')">Tập 10</div>
+            
+            <div class="ep-item uploading">Tập 11 (đang upload)</div>
+            <div class="ep-item uploading">Tập 12 (đang upload)</div>
+            <div class="ep-item uploading">Tập 13 (đang upload)</div>
+            <div class="ep-item uploading">Tập 14 (đang upload)</div>
+            <div class="ep-item uploading">Tập 15 (đang upload)</div>
+            <div class="ep-item uploading">Tập 16 (Cuối)</div>
+        </div>
+
+        <!-- Các nút liên kết cộng đồng (Mobile dưới phần tập phim) -->
+        <div class="link-buttons">
+            <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">
+                Tham gia nhóm Fanpage
+            </a>
+            <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">
+                Theo dõi &amp; nhấn chuông YTB
+            </a>
+            <button class="link-btn-primary link-btn" onclick="showDonateInfo()">
+                Donate duy trì kênh
+            </button>
+        </div>
+
+        <!-- Khung donate duy trì kênh -->
+        <div class="donate-box">
+            <div class="donate-text-title">Ủng hộ chi phí duy trì kênh</div>
+            <div class="donate-text-sub">
+                Ngân hàng: <strong>LE THI TUYET HOA</strong><br>
+                Số tài khoản: <strong>9323082004</strong><br>
+                Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+            </div>
+        </div>
+        <!-- Ghi chú miễn trừ trách nhiệm (Mobile) -->
+        <div style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
+            <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
+        </div>
+    </div>
+
+<!-- Modal donate -->
+<div id="donate-modal-backdrop" class="donate-modal-backdrop" onclick="hideDonateInfo(event)">
+    <div class="donate-modal">
+        <div class="donate-modal-title">Ủng hộ duy trì kênh</div>
+        <div class="donate-text-sub">
+            Chủ tài khoản: <strong>LE THI TUYET HOA</strong><br>
+            Số tài khoản: <strong>9323082004</strong><br>
+            Ghi chú chuyển khoản: <strong>Ung ho Lu Yeu Phim</strong><br><br>
+            Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+        </div>
+        <button class="donate-modal-close" onclick="hideDonateInfo()">Đã hiểu</button>
+    </div>
+</div>
+
+<script>
+    // --- LOGIC KIỂM TRA THIẾT BỊ ---
+    function checkDevice() {
+        // Luôn cho phép xem giao diện chính trên mọi thiết bị (PC, Mobile, Tablet)
+        var mobileContent = document.getElementById('mobile-content');
+        var pcBlocked = document.getElementById('pc-blocked');
+        if (mobileContent) mobileContent.style.display = 'block';
+        if (pcBlocked) pcBlocked.style.display = 'none';
+    }
+    checkDevice();
+
+    // --- LOAD DỮ LIỆU PHIM TỪ GOOGLE SHEET (đọc "Tên Phim Việt") ---
+    // Endpoint JSON của Sheet: ID=1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w, Sheet4
+    // Nếu sau này bạn đổi ID hoặc Sheet Name, chỉ cần sửa URL này.
+    const SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w/gviz/tq?tqx=out:json&sheet=Sheet4";
+
+    // movieIndex: { tenPhimViet: { episodes: [ {ep, embedUrl} ] } }
+    const movieIndex = {};
+
+    async function loadMoviesFromSheet() {
+        try {
+            const res = await fetch(SHEET_JSON_URL);
+            const text = await res.text();
+            // Gỡ wrapper "google.visualization.Query.setResponse(...)"
+            const jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+            const data = JSON.parse(jsonStr);
+            const rows = data.table.rows || [];
+
+            rows.forEach((row, idx) => {
+                const cells = row.c || [];
+                // Cột: 0 Tên Bộ Phim, 1 Số Tập, 2 Link DM, 3 Embed URL, 4 ID Kênh, 5 Ngày, 6 Tên Phim Việt
+                const tenPhimViet = (cells[6] && cells[6].v) ? String(cells[6].v).trim() : "";
+                const ep = cells[1] && cells[1].v != null ? Number(cells[1].v) : null;
+                const embedUrl = cells[3] && cells[3].v ? String(cells[3].v).trim() : "";
+
+                if (!tenPhimViet || !embedUrl || ep == null) return;
+
+                if (!movieIndex[tenPhimViet]) {
+                    movieIndex[tenPhimViet] = { episodes: [] };
+                }
+                movieIndex[tenPhimViet].episodes.push({ ep, embedUrl });
+            });
+
+            // Sắp xếp tập trong từng bộ
+            Object.values(movieIndex).forEach(m => {
+                m.episodes.sort((a, b) => a.ep - b.ep);
+            });
+        } catch (e) {
+            console.error("Lỗi khi load dữ liệu từ Google Sheet:", e);
+        }
+    }
+
+    function renderSearchResults(keyword) {
+        const box = document.getElementById('search-results');
+        if (!box) return;
+
+        const q = keyword.trim().toLowerCase();
+        box.innerHTML = "";
+        if (!q) {
+            box.style.display = "none";
+            return;
+        }
+
+        const names = Object.keys(movieIndex).filter(name =>
+            name.toLowerCase().includes(q)
+        );
+
+        if (!names.length) {
+            box.innerHTML = '<div class="search-result-item">Không tìm thấy phim phù hợp.</div>';
+            box.style.display = "block";
+            return;
+        }
+
+        names.slice(0, 30).forEach(name => {
+            const div = document.createElement('div');
+            div.className = 'search-result-item';
+            div.textContent = name;
+            div.onclick = () => {
+                box.style.display = "none";
+                document.getElementById('search-input').value = name;
+                loadMovieByName(name);
+            };
+            box.appendChild(div);
+        });
+        box.style.display = "block";
+    }
+
+    function loadMovieByName(name) {
+        const data = movieIndex[name];
+        if (!data || !data.episodes.length) return;
+
+        const episodes = data.episodes;
+        const epList = document.querySelector('.episode-list');
+        if (!epList) return;
+
+        // Xoá danh sách tập cũ
+        epList.innerHTML = "";
+
+        // Tạo lại danh sách tập theo dữ liệu sheet
+        episodes.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'ep-item';
+            div.textContent = "Tập " + item.ep;
+            div.onclick = function () {
+                changeEpisode(item.ep, item.embedUrl, name, this);
+            };
+            epList.appendChild(div);
+        });
+
+        // Auto chọn tập 1
+        const first = episodes[0];
+        changeEpisode(first.ep, first.embedUrl, name, epList.firstChild);
+    }
+
+    // Khởi tạo search input
+    document.addEventListener('DOMContentLoaded', () => {
+        const input = document.getElementById('search-input');
+        if (input) {
+            input.addEventListener('input', () => renderSearchResults(input.value));
+        }
+        loadMoviesFromSheet();
+    });
+
+    // --- LOGIC PHIM & SHOPEE ---
+    var myShopeeLink = "https://s.shopee.vn/1qUlcKbEqg"; 
+
+    function handlePlay() {
+        window.open(myShopeeLink, '_blank');
+        document.getElementById('overlay').style.display = 'none';
+    }
+
+    function showDonateInfo() {
+        var backdrop = document.getElementById('donate-modal-backdrop');
+        if (backdrop) {
+            backdrop.style.display = 'flex';
+        }
+    }
+
+    function hideDonateInfo(evt) {
+        // Nếu click ra ngoài hộp modal hoặc nút "Đã hiểu" thì đóng
+        if (evt && evt.target && !evt.target.classList.contains('donate-modal-backdrop') && evt.target.closest('.donate-modal') !== null) {
+            // click bên trong modal, nhưng không phải nút close → không làm gì
+            if (!evt.target.classList.contains('donate-modal-close')) {
+                return;
+            }
+        }
+        var backdrop = document.getElementById('donate-modal-backdrop');
+        if (backdrop) {
+            backdrop.style.display = 'none';
+        }
+    }
+
+    function changeEpisode(epNum, source, filmNameOverride, clickedEl) {
+        // Mỗi tập mới đều hiển thị lại overlay Shopee,
+        // người xem bấm nút thì overlay mới biến mất.
+        var overlay = document.getElementById('overlay');
+        if (overlay) overlay.style.display = 'flex';
+        var player = document.getElementById('video-player');
+        var src = String(source || "");
+        if (!src.startsWith("http")) {
+            src = "https://geo.dailymotion.com/player.html?video=" + src;
+        }
+        player.src = src;
+        
+        var displayTitle = "Tập " + epNum;
+        if(epNum == 16) displayTitle += " (Cuối)";
+        var filmName = filmNameOverride || "Phim Của Bạn";
+        document.getElementById('film-title').innerText = displayTitle + " - " + filmName;
+        
+        var eps = document.getElementsByClassName('ep-item');
+        for(var i=0; i<eps.length; i++) { eps[i].classList.remove('active'); }
+        if (clickedEl) {
+            clickedEl.classList.add('active');
+        } else if (typeof event !== "undefined" && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+    }
+</script>
+
+</body>
+</html>
