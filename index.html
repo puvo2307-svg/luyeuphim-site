@@ -245,6 +245,9 @@
         <div class="search-desc">
             Nhập <strong>tên phim</strong> giống như mô tả trên Fanpage/TikTok mà bạn đã xem. Ví dụ: <em>"Chàng Trai Xuyên Không Xây Dựng Đế Chế Bị Vợ Cắm Sừng Cướp Công Và Cái Kết Làm Chồng Nữ Đế"</em>
         </div>
+        <div class="search-desc" style="margin-top: 6px;">
+            Lưu ý: Muốn xem ổn định/đầy đủ, hãy mở bằng <strong>Safari (iOS)</strong> hoặc <strong>trình duyệt Chrome (Android)</strong>.
+        </div>
         <input id="search-input" class="search-input" type="text" placeholder="Nhập Tên Phim Việt để tìm..." autocomplete="off" />
         <div id="search-results" class="search-results" style="display:none;"></div>
     </div>
@@ -340,6 +343,7 @@ var SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1KxEhDNIH7AdgSBSL05
 var movieIndex = {};
 var filmToVietName = {}; // map: Tên Bộ Phim (cột A) -> Tên Phim Việt (cột G)
 var currentEpisode = null;
+var pendingOpen = null; // { id, ep } from URL hash
 
 function normalizeText(str) {
     return String(str || "")
@@ -410,6 +414,11 @@ function loadMoviesFromSheet() {
             });
 
             renderTopMovies();
+
+            // Nếu URL hash có phim/tập thì tự mở lại đúng trạng thái
+            if (pendingOpen && pendingOpen.id && movieIndex[pendingOpen.id]) {
+                loadMovieById(pendingOpen.id, { preferredEp: pendingOpen.ep, fromHash: true });
+            }
         })
         .catch(function(e) {
             console.error("Lỗi load sheet:", e);
@@ -539,7 +548,48 @@ function renderSearchResults(keyword) {
 }
 
 // ========== LOAD PHIM ==========
-function loadMovieById(id) {
+function getFirstEpisodeObj(episodes, preferredEp) {
+    if (!episodes || !episodes.length) return null;
+    var epNum = Number(preferredEp);
+    if (!isNaN(epNum)) {
+        for (var i = 0; i < episodes.length; i++) {
+            if (Number(episodes[i].ep) === epNum) return episodes[i];
+        }
+    }
+    return episodes[0];
+}
+
+function setUrlState(id, ep) {
+    try {
+        var safeId = encodeURIComponent(String(id || ""));
+        var safeEp = encodeURIComponent(String(ep || ""));
+        // dạng: #m=<id>&e=<ep>
+        window.location.hash = "m=" + safeId + "&e=" + safeEp;
+    } catch (e) {
+        // ignore
+    }
+}
+
+function parseUrlState() {
+    var h = (window.location.hash || "").replace(/^#/, "").trim();
+    if (!h) return null;
+    // support m=<id>&e=<ep>
+    var out = {};
+    h.split("&").forEach(function(part) {
+        var kv = part.split("=");
+        if (kv.length < 2) return;
+        var k = decodeURIComponent(kv[0] || "").trim();
+        var v = decodeURIComponent(kv.slice(1).join("=") || "").trim();
+        out[k] = v;
+    });
+    if (out.m) {
+        return { id: out.m, ep: out.e ? Number(out.e) : null };
+    }
+    return null;
+}
+
+function loadMovieById(id, opts) {
+    opts = opts || {};
     var data = movieIndex[id];
     if (!data || !data.episodes.length) return;
 
@@ -554,19 +604,33 @@ function loadMovieById(id) {
         div.className = 'ep-item';
         div.textContent = "Tập " + item.ep;
         div.onclick = function() {
-            changeEpisode(item.ep, item.embedUrl, data.displayName || id, this);
+            changeEpisode(item.ep, item.embedUrl, data.displayName || id, this, id);
         };
         epList.appendChild(div);
     });
 
-    var first = episodes[0];
+    var first = getFirstEpisodeObj(episodes, opts.preferredEp);
     var movieSection = document.getElementById('movie-section');
     if (movieSection) movieSection.style.display = 'block';
 
     // Scroll lên player
     movieSection.scrollIntoView({ behavior: 'smooth' });
 
-    changeEpisode(first.ep, first.embedUrl, data.displayName || id, epList.firstChild);
+    // active đúng tập
+    var activeEl = null;
+    for (var i = 0; i < epList.children.length; i++) {
+        var txt = epList.children[i].textContent || "";
+        if (txt.replace(/\s+/g, '').toLowerCase() === ("tập" + String(first.ep)).replace(/\s+/g, '').toLowerCase()) {
+            activeEl = epList.children[i];
+            break;
+        }
+    }
+    changeEpisode(first.ep, first.embedUrl, data.displayName || id, activeEl || epList.firstChild, id);
+
+    // set hash để back/reload vẫn đúng phim/tập
+    if (!opts.fromHash) {
+        setUrlState(id, first.ep);
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -574,6 +638,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (input) {
         input.addEventListener('input', function() { renderSearchResults(input.value); });
     }
+    pendingOpen = parseUrlState();
     loadMoviesFromSheet();
 });
 
@@ -604,7 +669,7 @@ function hideDonateInfo(evt) {
     if (backdrop) backdrop.style.display = 'none';
 }
 
-function changeEpisode(epNum, source, filmNameOverride, clickedEl) {
+function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId) {
     var overlay = document.getElementById('overlay');
     currentEpisode = Number(epNum);
     // Tập 1: KHÔNG hiện Shopee overlay
@@ -626,6 +691,11 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl) {
     var eps = document.getElementsByClassName('ep-item');
     for (var i = 0; i < eps.length; i++) { eps[i].classList.remove('active'); }
     if (clickedEl) clickedEl.classList.add('active');
+
+    // Lưu state lên URL để in-app browser back/reload không mất tập
+    if (movieId) {
+        setUrlState(movieId, currentEpisode);
+    }
 }
 </script>
 
