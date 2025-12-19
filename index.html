@@ -879,10 +879,8 @@ function renderTopMovies() {
     Object.keys(movieIndex).forEach(function(name) {
         var data = movieIndex[name];
         if (data.topRank != null) {
-            // Nếu là PC và phim không allow PC thì bỏ qua
-            if (!isMobile && !data.allowPC) {
-                return; // Skip phim này
-            }
+            // Luôn hiển thị TOP trên cả mobile và PC.
+            // Trên PC chỉ dùng để xem poster/tiêu đề, không click xem phim.
             entries.push({ id: name, name: data.displayName || name, rank: data.topRank, poster: data.poster });
         }
     });
