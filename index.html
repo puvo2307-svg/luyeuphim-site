@@ -190,6 +190,39 @@
             -webkit-box-orient: vertical;
         }
 
+        /* Tóm tắt phim: mặc định chỉ hiển thị 2 dòng, có thể mở rộng */
+        #film-summary {
+            margin-top: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #ccc;
+            line-height: 1.5;
+            text-align: left;
+            display: none;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+        #film-summary.expanded {
+            display: block;
+            overflow: visible;
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+        #film-summary-toggle {
+            display: none;
+            font-size: 12px;
+            color: #999;
+            cursor: pointer;
+            margin-top: -4px;
+            margin-bottom: 8px;
+            text-align: right;
+        }
+        #film-summary-toggle span {
+            text-decoration: underline;
+        }
+
         /* === BANNER CAROUSEL === */
         .banner-container {
             width: 100%;
@@ -379,7 +412,8 @@
     <!-- KHU VỰC XEM PHIM (ẨN CHO ĐẾN KHI CHỌN PHIM) -->
     <div id="movie-section" style="display:none; margin-top: 16px;">
         <h2 id="film-title" style="font-size: 20px;">Tập 1 - Tên Phim Của Bạn</h2>
-        <div id="film-summary" style="margin-top: 8px; margin-bottom: 12px; font-size: 14px; color: #ccc; line-height: 1.5; text-align: left; display: none;"></div>
+        <div id="film-summary"></div>
+        <div id="film-summary-toggle"><span>Xem thêm</span></div>
 
     <div class="player-container">
             <div id="overlay" onclick="handlePlay()">
@@ -1204,12 +1238,35 @@ function loadMovieById(id, opts) {
 
     // Hiển thị tóm tắt phim
     var summaryEl = document.getElementById('film-summary');
-    if (summaryEl) {
-        if (data.summary && data.summary.trim()) {
-            summaryEl.textContent = data.summary.trim();
-            summaryEl.style.display = 'block';
+    var summaryToggle = document.getElementById('film-summary-toggle');
+    if (summaryEl && summaryToggle) {
+        var summaryText = (data.summary || "").trim();
+        if (summaryText) {
+            summaryEl.textContent = summaryText;
+            summaryEl.classList.remove('expanded');
+            summaryEl.style.display = '-webkit-box';
+
+            // Hiển thị nút Xem thêm / Thu gọn
+            summaryToggle.style.display = 'block';
+            summaryToggle.dataset.expanded = 'false';
+            summaryToggle.querySelector('span').textContent = 'Xem thêm';
+
+            summaryToggle.onclick = function () {
+                var isExpanded = summaryToggle.dataset.expanded === 'true';
+                if (isExpanded) {
+                    summaryEl.classList.remove('expanded');
+                    summaryEl.style.display = '-webkit-box';
+                    summaryToggle.querySelector('span').textContent = 'Xem thêm';
+                    summaryToggle.dataset.expanded = 'false';
+                } else {
+                    summaryEl.classList.add('expanded');
+                    summaryToggle.querySelector('span').textContent = 'Thu gọn';
+                    summaryToggle.dataset.expanded = 'true';
+                }
+            };
         } else {
             summaryEl.style.display = 'none';
+            summaryToggle.style.display = 'none';
         }
     }
 
