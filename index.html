@@ -697,6 +697,27 @@ function loadMoviesFromSheetFallback() {
                 var poster = (cells[9] && cells[9].v) ? String(cells[9].v).trim() : ""; // Cột J: Poster URL
                 var banner = (cells[14] && cells[14].v) ? String(cells[14].v).trim() : ""; // Cột O: Banner
 
+                // Xử lý banner không có phim (chỉ có cột O)
+                if (!filmA && banner && banner.startsWith("http")) {
+                    var bannerExists = false;
+                    for (var i = 0; i < banners.length; i++) {
+                        if (typeof banners[i] === 'object' && banners[i].url === banner) {
+                            bannerExists = true;
+                            break;
+                        } else if (typeof banners[i] === 'string' && banners[i] === banner) {
+                            bannerExists = true;
+                            break;
+                        }
+                    }
+                    if (!bannerExists) {
+                        banners.push({
+                            url: banner,
+                            movieId: null  // Banner không gắn với phim nào
+                        });
+                    }
+                    return; // Skip dòng này, không xử lý phim
+                }
+
                 if (!filmA || !embedUrl || ep == null) return;
 
                 var resolvedViet = filmToVietName[filmA] || "";
@@ -747,18 +768,33 @@ function loadMoviesFromSheetFallback() {
 
                 // Collect banners - gắn với phim cụ thể
                 if (banner && banner.startsWith("http")) {
-                    // Kiểm tra xem banner này đã có chưa
-                    var bannerExists = false;
+                    // Tìm banner đã tồn tại (cùng URL)
+                    var existingBannerIndex = -1;
                     for (var i = 0; i < banners.length; i++) {
                         if (typeof banners[i] === 'object' && banners[i].url === banner) {
-                            bannerExists = true;
+                            existingBannerIndex = i;
                             break;
                         } else if (typeof banners[i] === 'string' && banners[i] === banner) {
-                            bannerExists = true;
+                            existingBannerIndex = i;
                             break;
                         }
                     }
-                    if (!bannerExists) {
+                    
+                    if (existingBannerIndex >= 0) {
+                        // Banner đã tồn tại → update movieId nếu chưa có
+                        if (typeof banners[existingBannerIndex] === 'object') {
+                            if (!banners[existingBannerIndex].movieId && filmA) {
+                                banners[existingBannerIndex].movieId = filmA;
+                            }
+                        } else if (typeof banners[existingBannerIndex] === 'string') {
+                            // Convert string thành object và gắn movieId
+                            banners[existingBannerIndex] = {
+                                url: banner,
+                                movieId: filmA || null
+                            };
+                        }
+                    } else {
+                        // Banner mới → thêm vào
                         banners.push({
                             url: banner,
                             movieId: filmA  // Gắn banner với phim này
