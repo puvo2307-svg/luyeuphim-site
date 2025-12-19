@@ -89,11 +89,32 @@ def export_sheet_to_json():
                 movies[film_name]['vietName'] = row.get('Tên Phim Việt', '').strip()
             if row.get('Tóm tắt phim', '').strip() and not movies[film_name]['summary']:
                 movies[film_name]['summary'] = row.get('Tóm tắt phim', '').strip()
-            if row.get('TOP') is not None:
-                current_top = movies[film_name]['top']
-                new_top = row.get('TOP')
-                if current_top is None or (new_top is not None and new_top < current_top):
-                    movies[film_name]['top'] = new_top
+            # TOP (cột I) - luôn lưu dạng số để tránh lỗi so sánh str/int
+            raw_top = row.get('TOP')
+            if raw_top is not None and str(raw_top).strip() != "":
+                # Chuyển TOP mới về int nếu có thể
+                new_top = None
+                try:
+                    # Trường hợp là số (int/float) hoặc chuỗi số
+                    new_top = int(raw_top) if isinstance(raw_top, int) else int(str(raw_top).strip())
+                except Exception:
+                    # Nếu parse không được thì bỏ qua TOP này
+                    new_top = None
+
+                if new_top is not None:
+                    current_top = movies[film_name]['top']
+                    # Convert current_top sang int nếu có
+                    if current_top is None or str(current_top).strip() == "":
+                        movies[film_name]['top'] = new_top
+                    else:
+                        try:
+                            current_top_int = int(current_top) if not isinstance(current_top, int) else current_top
+                        except Exception:
+                            # Nếu current_top đang bị kiểu linh tinh (str không convert được)
+                            current_top_int = new_top
+                        # Lưu TOP nhỏ nhất (ưu tiên TOP 1, 2, 3...)
+                        if current_top_int is None or new_top < current_top_int:
+                            movies[film_name]['top'] = new_top
             if row.get('Poster URL', '').strip() and not movies[film_name]['poster']:
                 movies[film_name]['poster'] = row.get('Poster URL', '').strip()
             if row.get('Năm', ''):
