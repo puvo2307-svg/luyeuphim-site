@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lu Yêu Phim – Trang thông tin / tổng hợp liên kết</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png" />
+    <link rel="apple-touch-icon" href="logo.png" />
+    
+    <!-- Open Graph / Facebook / Zalo -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.xemfulltap.live/" />
+    <meta property="og:title" id="og-title" content="Lu Yêu Phim – Trang thông tin / tổng hợp liên kết" />
+    <meta property="og:description" id="og-description" content="Xem phim miễn phí, tổng hợp các bộ phim hay nhất" />
+    <meta property="og:image" id="og-image" content="https://www.xemfulltap.live/logo.png" />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" id="twitter-title" content="Lu Yêu Phim – Trang thông tin / tổng hợp liên kết" />
+    <meta name="twitter:description" id="twitter-description" content="Xem phim miễn phí, tổng hợp các bộ phim hay nhất" />
+    <meta name="twitter:image" id="twitter-image" content="https://www.xemfulltap.live/logo.png" />
     <style>
         * { box-sizing: border-box; }
         body {
@@ -302,8 +319,8 @@
     <div style="margin-top: 20px; color: #555;">(Hỗ trợ: Android, iPhone, iPad)</div>
 
     <div class="link-buttons">
-        <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
-        <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
+        <a id="fanpage-link-pc" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
+        <a id="youtube-link-pc" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
         <button class="link-btn-primary link-btn" onclick="showDonateInfo()">Donate duy trì kênh</button>
     </div>
 
@@ -343,17 +360,17 @@
 
     <!-- NÚT CỘNG ĐỒNG + DONATE -->
     <div class="link-buttons">
-        <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
-        <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
+        <a id="fanpage-link" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
+        <a id="youtube-link" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
         <button class="link-btn-primary link-btn" onclick="showDonateInfo()">Donate duy trì kênh</button>
     </div>
 
     <div class="donate-box">
-        <div class="donate-text-title">Ủng hộ chi phí duy trì kênh</div>
-        <div class="donate-text-sub">
-            Ngân hàng: <strong>LE THI TUYET HOA</strong><br>
-            Số tài khoản: <strong class="stk">9323082004</strong><br>
-            Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+        <div class="donate-text-title" id="donate-title">Ủng hộ chi phí duy trì kênh</div>
+        <div class="donate-text-sub" id="donate-content">
+            Ngân hàng: <strong id="donate-account-name">LE THI TUYET HOA</strong><br>
+            Số tài khoản: <strong class="stk" id="donate-account-number">9323082004</strong><br>
+            <span id="donate-message">Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.</span>
         </div>
     </div>
 
@@ -383,12 +400,12 @@
 <!-- MODAL DONATE -->
 <div id="donate-modal-backdrop" class="donate-modal-backdrop" onclick="hideDonateInfo(event)">
     <div class="donate-modal">
-        <div class="donate-modal-title">Ủng hộ duy trì kênh</div>
-        <div class="donate-text-sub">
-            Chủ tài khoản: <strong>LE THI TUYET HOA</strong><br>
-            Số tài khoản: <strong class="stk">9323082004</strong><br>
-            Ghi chú chuyển khoản: <strong>Ung ho Lu Yeu Phim</strong><br><br>
-            Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+        <div class="donate-modal-title" id="donate-modal-title">Ủng hộ duy trì kênh</div>
+        <div class="donate-text-sub" id="donate-modal-content">
+            Chủ tài khoản: <strong id="donate-modal-account-name">LE THI TUYET HOA</strong><br>
+            Số tài khoản: <strong class="stk" id="donate-modal-account-number">9323082004</strong><br>
+            Ghi chú chuyển khoản: <strong id="donate-modal-note">Ung ho Lu Yeu Phim</strong><br><br>
+            <span id="donate-modal-message">Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.</span>
         </div>
         <button class="donate-modal-close" onclick="hideDonateInfo()">Đã hiểu</button>
     </div>
@@ -421,6 +438,137 @@ function checkDevice() {
 checkDevice();
 window.addEventListener('load', checkDevice);
 window.addEventListener('resize', checkDevice);
+
+// ========== LOAD CONFIG (Donate, Social Links, Meta) ==========
+var SITE_CONFIG_URL = "https://raw.githubusercontent.com/puvo2307-svg/luyeuphim-site/main/site-config.json";
+var siteConfig = null;
+
+function loadSiteConfig() {
+    fetch(SITE_CONFIG_URL)
+        .then(function(res) {
+            if (!res.ok) {
+                throw new Error("Không thể load config: " + res.status);
+            }
+            return res.json();
+        })
+        .then(function(config) {
+            siteConfig = config;
+            updateDonateInfo();
+            updateSocialLinks();
+            updateMetaTags();
+        })
+        .catch(function(e) {
+            console.error("Lỗi load config:", e);
+            // Dùng giá trị mặc định nếu load lỗi
+            useDefaultConfig();
+        });
+}
+
+function useDefaultConfig() {
+    siteConfig = {
+        donate: {
+            title: "Ủng hộ duy trì kênh",
+            accountName: "LE THI TUYET HOA",
+            accountNumber: "9323082004",
+            note: "Ung ho Lu Yeu Phim",
+            message: "Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài."
+        },
+        social: {
+            fanpage: "https://www.facebook.com/groups/luyeuphim",
+            youtube: "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1"
+        }
+    };
+    updateDonateInfo();
+    updateSocialLinks();
+}
+
+function updateDonateInfo() {
+    if (!siteConfig || !siteConfig.donate) return;
+    var d = siteConfig.donate;
+    
+    // Update donate box
+    var titleEl = document.getElementById('donate-title');
+    if (titleEl) titleEl.textContent = d.title || "Ủng hộ chi phí duy trì kênh";
+    
+    var accountNameEl = document.getElementById('donate-account-name');
+    if (accountNameEl) accountNameEl.textContent = d.accountName || "LE THI TUYET HOA";
+    
+    var accountNumberEl = document.getElementById('donate-account-number');
+    if (accountNumberEl) accountNumberEl.textContent = d.accountNumber || "9323082004";
+    
+    var messageEl = document.getElementById('donate-message');
+    if (messageEl) messageEl.textContent = d.message || "Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.";
+    
+    // Update donate modal
+    var modalTitleEl = document.getElementById('donate-modal-title');
+    if (modalTitleEl) modalTitleEl.textContent = d.title || "Ủng hộ duy trì kênh";
+    
+    var modalAccountNameEl = document.getElementById('donate-modal-account-name');
+    if (modalAccountNameEl) modalAccountNameEl.textContent = d.accountName || "LE THI TUYET HOA";
+    
+    var modalAccountNumberEl = document.getElementById('donate-modal-account-number');
+    if (modalAccountNumberEl) modalAccountNumberEl.textContent = d.accountNumber || "9323082004";
+    
+    var modalNoteEl = document.getElementById('donate-modal-note');
+    if (modalNoteEl) modalNoteEl.textContent = d.note || "Ung ho Lu Yeu Phim";
+    
+    var modalMessageEl = document.getElementById('donate-modal-message');
+    if (modalMessageEl) modalMessageEl.textContent = d.message || "Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.";
+}
+
+function updateSocialLinks() {
+    if (!siteConfig || !siteConfig.social) return;
+    var s = siteConfig.social;
+    
+    // Mobile links
+    var fanpageLink = document.getElementById('fanpage-link');
+    if (fanpageLink && s.fanpage) {
+        fanpageLink.href = s.fanpage;
+    }
+    
+    var youtubeLink = document.getElementById('youtube-link');
+    if (youtubeLink && s.youtube) {
+        youtubeLink.href = s.youtube;
+    }
+    
+    // PC links
+    var fanpageLinkPc = document.getElementById('fanpage-link-pc');
+    if (fanpageLinkPc && s.fanpage) {
+        fanpageLinkPc.href = s.fanpage;
+    }
+    
+    var youtubeLinkPc = document.getElementById('youtube-link-pc');
+    if (youtubeLinkPc && s.youtube) {
+        youtubeLinkPc.href = s.youtube;
+    }
+}
+
+function updateMetaTags() {
+    if (!siteConfig || !siteConfig.meta) return;
+    var m = siteConfig.meta;
+    
+    if (m.title) {
+        document.title = m.title;
+        var ogTitle = document.getElementById('og-title');
+        if (ogTitle) ogTitle.content = m.title;
+        var twitterTitle = document.getElementById('twitter-title');
+        if (twitterTitle) twitterTitle.content = m.title;
+    }
+    
+    if (m.description) {
+        var ogDesc = document.getElementById('og-description');
+        if (ogDesc) ogDesc.content = m.description;
+        var twitterDesc = document.getElementById('twitter-description');
+        if (twitterDesc) twitterDesc.content = m.description;
+    }
+    
+    if (m.image) {
+        var ogImage = document.getElementById('og-image');
+        if (ogImage) ogImage.content = m.image;
+        var twitterImage = document.getElementById('twitter-image');
+        if (twitterImage) twitterImage.content = m.image;
+    }
+}
 
 // ========== LOAD DỮ LIỆU TỪ JSON (Export từ Sheet) ==========
 // URL JSON file (sẽ được export tự động từ Sheet mỗi 10 phút)
@@ -1037,6 +1185,9 @@ function loadMovieById(id, opts) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Load site config (donate, social links, meta) trước
+    loadSiteConfig();
+    
     var input = document.getElementById('search-input');
     if (input) {
         input.addEventListener('input', function() { renderSearchResults(input.value); });
