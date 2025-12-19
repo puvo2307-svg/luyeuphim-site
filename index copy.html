@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lu Yêu Phim – Trang thông tin / tổng hợp liên kết</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            text-align: center;
+            background: #121212;
+            color: white;
+            padding: 15px;
+            margin: 0;
+        }
+
+        /* === CHẶN PC === */
+        #pc-blocked {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        #pc-blocked h1 { color: #ee4d2d; }
+
+        /* === NỘI DUNG CHÍNH === */
+        #mobile-content {
+            display: none;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* === PLAYER 9:16 === */
+        .player-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto 20px;
+            background: #000;
+            aspect-ratio: 9/16;
+            max-height: calc(100vh - 220px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        iframe { width: 100%; height: 100%; border: none; }
+
+        /* === OVERLAY SHOPEE === */
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 99; cursor: pointer;
+            padding: 20px;
+        }
+        .btn-shopee-main {
+            background: linear-gradient(135deg, #ff5722 0%, #ee4d2d 100%);
+            color: white; border: none; padding: 18px 35px;
+            font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 8px 15px rgba(238, 77, 45, 0.4);
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .text-support { color: #f1c40f; font-size: 16px; margin-bottom: 15px; font-weight: 500; }
+        .text-note { color: #777; font-size: 13px; margin-top: 15px; line-height: 1.4; }
+
+        /* === EPISODE LIST === */
+        .episode-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            gap: 10px; padding: 15px;
+            background: #1e1e1e; border-radius: 15px;
+        }
+        .ep-item {
+            background: #333; color: #ccc; border: 1px solid #444;
+            padding: 12px 5px; cursor: pointer; border-radius: 8px;
+            font-weight: 500; font-size: 14px;
+        }
+        .ep-item.active { background: #ee4d2d; color: white; border-color: #ee4d2d; font-weight: bold; }
+        .ep-item.uploading { background: #222; color: #555; border: 1px dashed #444; cursor: not-allowed; }
+
+        /* === TÌM KIẾM === */
+        .search-container { margin-bottom: 16px; text-align: left; }
+        .search-title { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
+        .search-desc { font-size: 13px; color: #bbb; margin-bottom: 8px; }
+        .search-input {
+            width: 100%; padding: 10px 12px; border-radius: 8px;
+            border: 1px solid #444; background: #1b1b1b; color: #eee; font-size: 14px;
+        }
+        .search-results {
+            margin-top: 6px; max-height: 160px; overflow-y: auto;
+            border-radius: 8px; border: 1px solid #333; background: #181818;
+        }
+        .search-result-item {
+            padding: 8px 10px; font-size: 13px; cursor: pointer; border-bottom: 1px solid #222;
+        }
+        .search-result-item:last-child { border-bottom: none; }
+        .search-result-item:hover { background: #262626; }
+
+        /* === TOP PHIM (CUỘN NGANG) === */
+        .top-section { margin-top: 18px; text-align: left; }
+        .top-title { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
+        .top-grid {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 8px;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        /* Ẩn thanh cuộn nhưng vẫn cuộn được */
+        .top-grid::-webkit-scrollbar { height: 4px; }
+        .top-grid::-webkit-scrollbar-track { background: #222; border-radius: 4px; }
+        .top-grid::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        .top-card {
+            flex: 0 0 100px; /* Chiều rộng cố định 100px */
+            min-width: 100px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s;
+            scroll-snap-align: start;
+        }
+        @media (min-width: 500px) {
+            .top-card { flex: 0 0 110px; min-width: 110px; }
+        }
+        .top-card:hover { transform: scale(1.03); }
+        .top-card-wrapper { position: relative; }
+        .top-card-img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            background: #222;
+            display: block;
+        }
+        /* No Pic placeholder */
+        .top-card-nopic {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .top-card-rank {
+            position: absolute;
+            top: 4px; left: 4px;
+            background: #ee4d2d;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .top-card-name {
+            padding: 5px 4px;
+            font-size: 10px;
+            color: #ccc;
+            line-height: 1.3;
+            text-align: center;
+            height: 30px; /* 2 dòng x 13px */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* === LINK BUTTONS === */
+        .link-buttons { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .link-btn {
+            padding: 8px 14px; border-radius: 999px; border: 1px solid #333;
+            background: #1e1e1e; color: #f5f5f5; font-size: 13px;
+            cursor: pointer; text-decoration: none; white-space: nowrap;
+        }
+        .link-btn:hover { background: #333; }
+        .link-btn-primary { border-color: #ee4d2d; background: #ee4d2d; }
+        .link-btn-primary:hover { background: #ff6a3a; }
+
+        /* === DONATE BOX === */
+        .donate-box {
+            margin-top: 18px; padding: 12px 14px; background: #181818;
+            border-radius: 10px; border: 1px solid #333; font-size: 13px; text-align: left;
+        }
+        .donate-text-title { font-weight: 600; color: #f1c40f; margin-bottom: 4px; }
+        .donate-text-sub { color: #aaa; line-height: 1.4; }
+
+        /* === DONATE MODAL === */
+        .donate-modal-backdrop {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            display: none; align-items: center; justify-content: center; z-index: 9999;
+        }
+        .donate-modal {
+            background: #181818; border-radius: 12px; padding: 18px 20px;
+            border: 1px solid #333; max-width: 320px; width: 90%;
+            text-align: left; box-shadow: 0 8px 20px rgba(0,0,0,0.6); font-size: 14px;
+        }
+        .donate-modal-title { font-weight: 600; margin-bottom: 8px; color: #f1c40f; }
+        .donate-modal-close {
+            margin-top: 14px; width: 100%; padding: 8px 0; border-radius: 8px;
+            border: none; background: #ee4d2d; color: white; font-weight: 600; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== CHẶN PC ========== -->
+<div id="pc-blocked">
+    <!-- Dải phim đề xuất chỉ để xem, không click, không mở Shopee -->
+    <div id="top-section-pc" class="top-section" style="max-width: 900px; width: 100%; margin-bottom: 24px;">
+        <div class="top-title">📺 Phim đề xuất</div>
+        <div id="top-grid-pc" class="top-grid" style="cursor: default;"></div>
+    </div>
+
+    <h1>⚠️ THÔNG BÁO</h1>
+    <p>Nội dung này hiện chỉ hỗ trợ xem trên <strong>Thiết bị di động (Mobile)</strong>.</p>
+    <p style="margin-top: 10px; max-width: 700px; font-size: 14px; color: #ccc;">
+        Hãy nhập <strong>xemfulltap.live</strong> trên trình duyệt <strong>mobile</strong> để tìm phim rồi xem, hoặc xem các phim được đề xuất. Xin cảm ơn!
+    </p>
+    <div style="margin-top: 20px; color: #555;">(Hỗ trợ: Android, iPhone, iPad)</div>
+
+    <div class="link-buttons">
+        <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
+        <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
+        <button class="link-btn-primary link-btn" onclick="showDonateInfo()">Donate duy trì kênh</button>
+    </div>
+
+    <div style="max-width: 900px; margin: 20px auto 0 auto; font-size: 12px; color: #888; text-align: left; padding: 0 12px;">
+        <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
+    </div>
+</div>
+
+<!-- ========== NỘI DUNG MOBILE ========== -->
+<div id="mobile-content">
+    <!-- TÌM KIẾM -->
+    <div class="search-container">
+        <div class="search-title">Tìm phim theo tên tiếng Việt</div>
+        <div class="search-desc">
+            Nhập <strong>tên phim</strong> giống như mô tả trên Fanpage/TikTok mà bạn đã xem. Ví dụ: <em>"Chàng Trai Xuyên Không Xây Dựng Đế Chế Bị Vợ Cắm Sừng Cướp Công Và Cái Kết Làm Chồng Nữ Đế"</em>
+        </div>
+        <div class="search-desc" style="margin-top: 6px;">
+            Lưu ý: Muốn xem ổn định/đầy đủ, hãy mở bằng <strong>Safari (iOS)</strong> hoặc <strong>trình duyệt Chrome (Android)</strong>.
+        </div>
+        <input id="search-input" class="search-input" type="text" placeholder="Nhập Tên Phim Việt để tìm..." autocomplete="off" />
+        <div id="search-results" class="search-results" style="display:none;"></div>
+    </div>
+
+    <!-- PHIM ĐỀ XUẤT (TOP) - HIỂN THỊ ẢNH BÌA -->
+    <div id="top-section" class="top-section" style="display:none;">
+        <div class="top-title">📺 Phim đề xuất</div>
+        <div id="top-grid" class="top-grid"></div>
+    </div>
+
+    <!-- NÚT CỘNG ĐỒNG + DONATE -->
+    <div class="link-buttons">
+        <a class="link-btn" href="https://www.facebook.com/groups/luyeuphim" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
+        <a class="link-btn" href="https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
+        <button class="link-btn-primary link-btn" onclick="showDonateInfo()">Donate duy trì kênh</button>
+    </div>
+
+    <div class="donate-box">
+        <div class="donate-text-title">Ủng hộ chi phí duy trì kênh</div>
+        <div class="donate-text-sub">
+            Ngân hàng: <strong>LE THI TUYET HOA</strong><br>
+            Số tài khoản: <strong>9323082004</strong><br>
+            Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+        </div>
+    </div>
+
+    <!-- KHU VỰC XEM PHIM (ẨN CHO ĐẾN KHI CHỌN PHIM) -->
+    <div id="movie-section" style="display:none; margin-top: 16px;">
+        <h2 id="film-title" style="font-size: 20px;">Tập 1 - Tên Phim Của Bạn</h2>
+
+        <div class="player-container">
+            <div id="overlay" onclick="handlePlay()">
+                <p class="text-support">Ủng hộ chi phí duy trì và vận hành kênh Lu Yêu Phim</p>
+                <button class="btn-shopee-main">🛒 MỞ SHOPEE & QUAY LẠI XEM FULL</button>
+                <p class="text-note">(Xin lỗi nếu overlay xuất hiện nhiều; đây là một phần chi phí duy trì kênh. App Shopee sẽ mở ở tab mới, bạn có thể quay lại đây sau khi hoàn tất.)</p>
+            </div>
+            <!-- autoplay mặc định =1, tắt overlay để người dùng chủ động Play nếu muốn -->
+            <iframe id="video-player" src="" allow="fullscreen" allowfullscreen></iframe>
+        </div>
+
+        <div id="episode-list" class="episode-list"></div>
+
+        <div style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
+            <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DONATE -->
+<div id="donate-modal-backdrop" class="donate-modal-backdrop" onclick="hideDonateInfo(event)">
+    <div class="donate-modal">
+        <div class="donate-modal-title">Ủng hộ duy trì kênh</div>
+        <div class="donate-text-sub">
+            Chủ tài khoản: <strong>LE THI TUYET HOA</strong><br>
+            Số tài khoản: <strong>9323082004</strong><br>
+            Ghi chú chuyển khoản: <strong>Ung ho Lu Yeu Phim</strong><br><br>
+            Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.
+        </div>
+        <button class="donate-modal-close" onclick="hideDonateInfo()">Đã hiểu</button>
+    </div>
+</div>
+
+<script>
+// ========== KIỂM TRA THIẾT BỊ ==========
+function checkDevice() {
+    var ua = navigator.userAgent || navigator.vendor || window.opera;
+    var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|mobile|CriOS/i.test(ua);
+    
+    // Thêm check màn hình nhỏ (fallback)
+    if (!isMobile && window.innerWidth <= 900 && 'ontouchstart' in window) {
+        isMobile = true;
+    }
+
+    var mobileContent = document.getElementById('mobile-content');
+    var pcBlocked = document.getElementById('pc-blocked');
+
+    if (isMobile) {
+        if (mobileContent) mobileContent.style.display = 'block';
+        if (pcBlocked) pcBlocked.style.display = 'none';
+    } else {
+        if (mobileContent) mobileContent.style.display = 'none';
+        if (pcBlocked) pcBlocked.style.display = 'flex';
+    }
+}
+
+// Chạy ngay và chạy lại khi load xong
+checkDevice();
+window.addEventListener('load', checkDevice);
+window.addEventListener('resize', checkDevice);
+
+// ========== LOAD DỮ LIỆU TỪ GOOGLE SHEET ==========
+// Cột: A=Tên Bộ Phim, B=Số Tập, C=Link DM, D=Embed URL, E=ID Kênh, F=Ngày, G=Tên Phim Việt, H=TOP, I=Poster
+var SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w/gviz/tq?tqx=out:json&sheet=Sheet4";
+var movieIndex = {};
+var filmToVietName = {}; // map: Tên Bộ Phim (cột A) -> Tên Phim Việt (cột G)
+var currentEpisode = null;
+var pendingOpen = null; // { id, ep } from URL hash
+
+function normalizeText(str) {
+    return String(str || "")
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function loadMoviesFromSheet() {
+    fetch(SHEET_JSON_URL)
+        .then(function(res) { return res.text(); })
+        .then(function(text) {
+            var jsonStr = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+            var data = JSON.parse(jsonStr);
+            var rows = data.table.rows || [];
+
+            // Reset mỗi lần load
+            movieIndex = {};
+            filmToVietName = {};
+
+            // Pass 1: gom Tên Phim Việt theo Tên Bộ Phim (A)
+            rows.forEach(function(row) {
+                var cells = row.c || [];
+                var filmA = (cells[0] && cells[0].v) ? String(cells[0].v).trim() : ""; // Cột A
+                var tenPhimViet = (cells[6] && cells[6].v) ? String(cells[6].v).trim() : "";
+                if (filmA && tenPhimViet && !filmToVietName[filmA]) {
+                    filmToVietName[filmA] = tenPhimViet;
+                }
+            });
+
+            // Pass 2: build index tập theo Tên Bộ Phim (A), và dùng Tên Phim Việt nếu có
+            rows.forEach(function(row) {
+                var cells = row.c || [];
+                var filmA = (cells[0] && cells[0].v) ? String(cells[0].v).trim() : ""; // Cột A
+                var ep = (cells[1] && cells[1].v != null) ? Number(cells[1].v) : null;
+                var embedUrl = (cells[3] && cells[3].v) ? String(cells[3].v).trim() : "";
+                var topRaw = (cells[7] && cells[7].v != null) ? Number(cells[7].v) : null;
+                var poster = (cells[8] && cells[8].v) ? String(cells[8].v).trim() : "";
+
+                // Nếu không có tên phim (A) hoặc không có tập/embed thì bỏ
+                if (!filmA || !embedUrl || ep == null) return;
+
+                // Resolve tên hiển thị: ưu tiên Tên Phim Việt (G), fallback về A
+                var resolvedViet = filmToVietName[filmA] || "";
+                var displayName = resolvedViet || filmA;
+
+                // Key theo filmA để tránh bị split khi các dòng thiếu Tên Phim Việt
+                if (!movieIndex[filmA]) {
+                    movieIndex[filmA] = { episodes: [], topRank: null, poster: "", displayName: displayName };
+                }
+                movieIndex[filmA].displayName = displayName;
+                movieIndex[filmA].episodes.push({ ep: ep, embedUrl: embedUrl });
+
+                if (topRaw != null && !isNaN(topRaw)) {
+                    var current = movieIndex[filmA].topRank;
+                    movieIndex[filmA].topRank = (current == null) ? topRaw : Math.min(current, topRaw);
+                }
+                if (poster && !movieIndex[filmA].poster) {
+                    movieIndex[filmA].poster = poster;
+                }
+            });
+
+            Object.keys(movieIndex).forEach(function(key) {
+                movieIndex[key].episodes.sort(function(a, b) { return a.ep - b.ep; });
+            });
+
+            renderTopMovies();
+
+            // Nếu URL hash có phim/tập thì tự mở lại đúng trạng thái
+            if (pendingOpen && pendingOpen.id && movieIndex[pendingOpen.id]) {
+                loadMovieById(pendingOpen.id, { preferredEp: pendingOpen.ep, fromHash: true });
+            }
+        })
+        .catch(function(e) {
+            console.error("Lỗi load sheet:", e);
+        });
+}
+
+// ========== HIỂN THỊ TOP PHIM (ẢNH BÌA) ==========
+function renderTopMovies() {
+    // Mobile
+    var section = document.getElementById('top-section');
+    var gridEl = document.getElementById('top-grid');
+    // PC (chỉ hiển thị, không click)
+    var pcSection = document.getElementById('top-section-pc');
+    var pcGrid = document.getElementById('top-grid-pc');
+
+    if (gridEl) gridEl.innerHTML = "";
+    if (pcGrid) pcGrid.innerHTML = "";
+
+    var entries = [];
+    Object.keys(movieIndex).forEach(function(name) {
+        var data = movieIndex[name];
+        if (data.topRank != null) {
+            entries.push({ id: name, name: data.displayName || name, rank: data.topRank, poster: data.poster });
+        }
+    });
+    entries.sort(function(a, b) { return a.rank - b.rank; });
+
+    if (!entries.length) {
+        if (section) section.style.display = "none";
+        if (pcSection) pcSection.style.display = "none";
+        return;
+    }
+
+    // Helper tạo card
+    function createCard(item, clickable) {
+        var card = document.createElement('div');
+        card.className = 'top-card';
+        if (clickable) {
+            card.onclick = function() { loadMovieById(item.id); };
+        }
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'top-card-wrapper';
+
+        // Nếu có poster thì hiện ảnh, không thì hiện "No Pic"
+        if (item.poster && item.poster.trim()) {
+            var img = document.createElement('img');
+            img.className = 'top-card-img';
+            img.src = item.poster;
+            img.alt = item.name;
+            img.onerror = function() {
+                // Nếu ảnh lỗi thì thay bằng No Pic
+                var nopic = document.createElement('div');
+                nopic.className = 'top-card-nopic';
+                nopic.textContent = 'No Pic';
+                this.parentNode.replaceChild(nopic, this);
+            };
+            wrapper.appendChild(img);
+        } else {
+            var nopic = document.createElement('div');
+            nopic.className = 'top-card-nopic';
+            nopic.textContent = 'No Pic';
+            wrapper.appendChild(nopic);
+        }
+
+        var rankBadge = document.createElement('div');
+        rankBadge.className = 'top-card-rank';
+        rankBadge.textContent = 'TOP ' + item.rank;
+        wrapper.appendChild(rankBadge);
+
+        var nameDiv = document.createElement('div');
+        nameDiv.className = 'top-card-name';
+        nameDiv.textContent = item.name;
+
+        card.appendChild(wrapper);
+        card.appendChild(nameDiv);
+        return card;
+    }
+
+    entries.forEach(function(item) {
+        if (gridEl) {
+            gridEl.appendChild(createCard(item, true));   // mobile: có click
+        }
+        if (pcGrid) {
+            pcGrid.appendChild(createCard(item, false));  // PC: chỉ xem
+        }
+    });
+
+    if (section) section.style.display = "block";
+    if (pcSection) pcSection.style.display = "block";
+}
+
+// ========== TÌM KIẾM ==========
+function renderSearchResults(keyword) {
+    var box = document.getElementById('search-results');
+    if (!box) return;
+
+    var qNorm = normalizeText(keyword);
+    box.innerHTML = "";
+    if (!qNorm) {
+        box.style.display = "none";
+        return;
+    }
+
+    var names = Object.keys(movieIndex)
+        .map(function(id) { return { id: id, name: (movieIndex[id].displayName || id) }; })
+        .filter(function(item) { return normalizeText(item.name).includes(qNorm); });
+
+    if (!names.length) {
+        box.innerHTML = '<div class="search-result-item">Không tìm thấy phim phù hợp.</div>';
+        box.style.display = "block";
+        return;
+    }
+
+    names.slice(0, 30).forEach(function(item) {
+        var div = document.createElement('div');
+        div.className = 'search-result-item';
+        div.textContent = item.name;
+        div.onclick = function() {
+            box.style.display = "none";
+            document.getElementById('search-input').value = item.name;
+            loadMovieById(item.id);
+        };
+        box.appendChild(div);
+    });
+    box.style.display = "block";
+}
+
+// ========== LOAD PHIM ==========
+function getFirstEpisodeObj(episodes, preferredEp) {
+    if (!episodes || !episodes.length) return null;
+    var epNum = Number(preferredEp);
+    if (!isNaN(epNum)) {
+        for (var i = 0; i < episodes.length; i++) {
+            if (Number(episodes[i].ep) === epNum) return episodes[i];
+        }
+    }
+    return episodes[0];
+}
+
+function setUrlState(id, ep) {
+    try {
+        var safeId = encodeURIComponent(String(id || ""));
+        var safeEp = encodeURIComponent(String(ep || ""));
+        // dạng: #m=<id>&e=<ep>
+        window.location.hash = "m=" + safeId + "&e=" + safeEp;
+    } catch (e) {
+        // ignore
+    }
+}
+
+function parseUrlState() {
+    var h = (window.location.hash || "").replace(/^#/, "").trim();
+    if (!h) return null;
+    // support m=<id>&e=<ep>
+    var out = {};
+    h.split("&").forEach(function(part) {
+        var kv = part.split("=");
+        if (kv.length < 2) return;
+        var k = decodeURIComponent(kv[0] || "").trim();
+        var v = decodeURIComponent(kv.slice(1).join("=") || "").trim();
+        out[k] = v;
+    });
+    if (out.m) {
+        return { id: out.m, ep: out.e ? Number(out.e) : null };
+    }
+    return null;
+}
+
+function loadMovieById(id, opts) {
+    opts = opts || {};
+    var data = movieIndex[id];
+    if (!data || !data.episodes.length) return;
+
+    var episodes = data.episodes;
+    var epList = document.getElementById('episode-list');
+    if (!epList) return;
+
+    epList.innerHTML = "";
+
+    episodes.forEach(function(item) {
+        var div = document.createElement('div');
+        div.className = 'ep-item';
+        div.textContent = "Tập " + item.ep;
+        div.onclick = function() {
+            changeEpisode(item.ep, item.embedUrl, data.displayName || id, this, id);
+        };
+        epList.appendChild(div);
+    });
+
+    var first = getFirstEpisodeObj(episodes, opts.preferredEp);
+    var movieSection = document.getElementById('movie-section');
+    if (movieSection) movieSection.style.display = 'block';
+
+    // Scroll lên player
+    movieSection.scrollIntoView({ behavior: 'smooth' });
+
+    // active đúng tập
+    var activeEl = null;
+    for (var i = 0; i < epList.children.length; i++) {
+        var txt = epList.children[i].textContent || "";
+        if (txt.replace(/\s+/g, '').toLowerCase() === ("tập" + String(first.ep)).replace(/\s+/g, '').toLowerCase()) {
+            activeEl = epList.children[i];
+            break;
+        }
+    }
+    changeEpisode(first.ep, first.embedUrl, data.displayName || id, activeEl || epList.firstChild, id);
+
+    // set hash để back/reload vẫn đúng phim/tập
+    if (!opts.fromHash) {
+        setUrlState(id, first.ep);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('search-input');
+    if (input) {
+        input.addEventListener('input', function() { renderSearchResults(input.value); });
+    }
+    pendingOpen = parseUrlState();
+    loadMoviesFromSheet();
+});
+
+// ========== SHOPEE & PLAYER ==========
+var myShopeeLink = "https://s.shopee.vn/1qUlcKbEqg";
+
+function handlePlay() {
+    var overlay = document.getElementById('overlay');
+    // Tập 1: không mở Shopee, chỉ tắt overlay (nếu có)
+    if (currentEpisode === 1) {
+        if (overlay) overlay.style.display = 'none';
+        return;
+    }
+    window.open(myShopeeLink, '_blank');
+    if (overlay) overlay.style.display = 'none';
+}
+
+function showDonateInfo() {
+    var backdrop = document.getElementById('donate-modal-backdrop');
+    if (backdrop) backdrop.style.display = 'flex';
+}
+
+function hideDonateInfo(evt) {
+    if (evt && evt.target && !evt.target.classList.contains('donate-modal-backdrop') && evt.target.closest('.donate-modal') !== null) {
+        if (!evt.target.classList.contains('donate-modal-close')) return;
+    }
+    var backdrop = document.getElementById('donate-modal-backdrop');
+    if (backdrop) backdrop.style.display = 'none';
+}
+
+function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId) {
+    var overlay = document.getElementById('overlay');
+    currentEpisode = Number(epNum);
+    // Tập 1: KHÔNG hiện Shopee overlay
+    if (overlay) {
+        overlay.style.display = (currentEpisode === 1) ? 'none' : 'flex';
+    }
+
+    var player = document.getElementById('video-player');
+    var src = String(source || "");
+    if (!src.startsWith("http")) {
+        // Bật autoplay (mute=1 để tương thích mobile)
+        src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
+    }
+    player.src = src;
+
+    var displayTitle = "Tập " + epNum;
+    var filmName = filmNameOverride || "Tên Phim";
+    document.getElementById('film-title').innerText = displayTitle + " - " + filmName;
+
+    var eps = document.getElementsByClassName('ep-item');
+    for (var i = 0; i < eps.length; i++) { eps[i].classList.remove('active'); }
+    if (clickedEl) clickedEl.classList.add('active');
+
+    // Lưu state lên URL để in-app browser back/reload không mất tập
+    if (movieId) {
+        setUrlState(movieId, currentEpisode);
+    }
+}
+</script>
+
+</body>
+</html>
