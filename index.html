@@ -1227,7 +1227,7 @@ function loadMovieById(id, opts) {
         div.className = 'ep-item';
         div.textContent = "Tập " + item.ep;
         div.onclick = function() {
-            changeEpisode(item.ep, item.embedUrl, data.displayName || id, this, id, item.shopeeLink);
+            changeEpisode(item.ep, item.embedUrl, data.displayName || id, this, id, item.shopeeLink, item.videoUrl);
         };
         epList.appendChild(div);
     });
@@ -1282,7 +1282,7 @@ function loadMovieById(id, opts) {
             break;
         }
     }
-    changeEpisode(first.ep, first.embedUrl, data.displayName || id, activeEl || epList.firstChild, id, first.shopeeLink);
+    changeEpisode(first.ep, first.embedUrl, data.displayName || id, activeEl || epList.firstChild, id, first.shopeeLink, first.videoUrl);
 
     // set hash để back/reload vẫn đúng phim/tập
     if (!opts.fromHash) {
@@ -1331,7 +1331,7 @@ function hideDonateInfo(evt) {
     if (backdrop) backdrop.style.display = 'none';
 }
 
-function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shopeeLink) {
+function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shopeeLink, videoUrl) {
     var overlay = document.getElementById('overlay');
     currentEpisode = Number(epNum);
     
@@ -1348,13 +1348,19 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         overlay.style.display = (currentEpisode === 1) ? 'none' : 'flex';
     }
 
-    var player = document.getElementById('video-player');
-    var src = String(source || "");
-    if (!src.startsWith("http")) {
-        // Bật autoplay (mute=1 để tương thích mobile)
-        src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
+    // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → mở tab mới
+    if (currentEpisode === 1 && videoUrl && String(videoUrl).trim().startsWith("http")) {
+        window.open(String(videoUrl).trim(), "_blank");
+        // Không đổi player, chỉ redirect người dùng
+    } else {
+        var player = document.getElementById('video-player');
+        var src = String(source || "");
+        if (!src.startsWith("http")) {
+            // Bật autoplay (mute=1 để tương thích mobile)
+            src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
+        }
+        player.src = src;
     }
-    player.src = src;
 
     var displayTitle = "Tập " + epNum;
     var filmName = filmNameOverride || "Tên Phim";
