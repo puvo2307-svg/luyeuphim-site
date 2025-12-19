@@ -24,7 +24,11 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: |
-          python -c "import os, json; json.dump(json.loads(os.environ['GOOGLE_CREDENTIALS']), open('drive_client_secret.json', 'w'), indent=2)"
+          if [ -z "$GOOGLE_CREDENTIALS" ]; then
+            echo "ERROR: GOOGLE_CREDENTIALS is empty!"
+            exit 1
+          fi
+          echo "$GOOGLE_CREDENTIALS" > drive_client_secret.json
           python export_sheet_to_json.py
       
       - name: Commit and push
