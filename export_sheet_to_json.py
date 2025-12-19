@@ -71,12 +71,15 @@ def export_sheet_to_json():
             
             # Khởi tạo phim nếu chưa có
             if film_name not in movies:
+                # Poster có thể nằm ở cột "Poster URL" hoặc "Poster"
+                poster_value = row.get('Poster URL', '').strip() or row.get('Poster', '').strip()
+
                 movies[film_name] = {
                     'name': film_name,
                     'vietName': row.get('Tên Phim Việt', '').strip() or film_name,
                     'summary': row.get('Tóm tắt phim', '').strip(),  # Cột H
                     'top': row.get('TOP'),
-                    'poster': row.get('Poster URL', '').strip(),
+                    'poster': poster_value,
                     'year': row.get('Năm', ''),
                     'genre': row.get('Thể loại', '').strip(),
                     'country': row.get('Quốc gia', '').strip(),
@@ -115,8 +118,10 @@ def export_sheet_to_json():
                         # Lưu TOP nhỏ nhất (ưu tiên TOP 1, 2, 3...)
                         if current_top_int is None or new_top < current_top_int:
                             movies[film_name]['top'] = new_top
-            if row.get('Poster URL', '').strip() and not movies[film_name]['poster']:
-                movies[film_name]['poster'] = row.get('Poster URL', '').strip()
+            # Poster (cột J) - chấp nhận cả tiêu đề "Poster URL" hoặc "Poster"
+            poster_raw = row.get('Poster URL', '').strip() or row.get('Poster', '').strip()
+            if poster_raw and not movies[film_name]['poster']:
+                movies[film_name]['poster'] = poster_raw
             if row.get('Năm', ''):
                 movies[film_name]['year'] = row.get('Năm', '')
             if row.get('Thể loại', '').strip():
