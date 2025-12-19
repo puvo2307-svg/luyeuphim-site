@@ -423,9 +423,9 @@ window.addEventListener('load', checkDevice);
 window.addEventListener('resize', checkDevice);
 
 // ========== LOAD DỮ LIỆU TỪ JSON (Export từ Sheet) ==========
-// URL JSON file (sẽ được export tự động từ Sheet mỗi 5-10 phút)
-var MOVIES_JSON_URL = "https://xemfulltap.live/movies.json";
-// Fallback nếu dùng GitHub: "https://raw.githubusercontent.com/USERNAME/REPO/main/movies.json"
+// URL JSON file (sẽ được export tự động từ Sheet mỗi 10 phút)
+var MOVIES_JSON_URL = "https://raw.githubusercontent.com/puvo2307-svg/luyeuphim-site/main/movies.json";
+// Fallback nếu JSON lỗi thì load từ Sheet trực tiếp
 
 var movieIndex = {};
 var banners = []; // Danh sách banner từ cột N
