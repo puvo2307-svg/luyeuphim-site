@@ -24,7 +24,7 @@ jobs:
         env:
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
         run: |
-          echo "$GOOGLE_CREDENTIALS" > drive_client_secret.json
+          python -c "import os, json; json.dump(json.loads(os.environ['GOOGLE_CREDENTIALS']), open('drive_client_secret.json', 'w'), indent=2)"
           python export_sheet_to_json.py
       
       - name: Commit and push
