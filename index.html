@@ -282,7 +282,7 @@
         }
         .donate-text-title { font-weight: 600; color: #f1c40f; margin-bottom: 4px; }
         .donate-text-sub { color: #aaa; line-height: 1.4; }
-        .donate-text-sub strong.stk { color: #f1c40f; font-size: 15px; } /* Màu vàng cho STK */
+        .donate-text-sub strong.stk { color: #ff6a3a; font-size: 15px; font-weight: bold; } /* Màu cam cho STK */
 
         /* === DONATE MODAL === */
         .donate-modal-backdrop {
@@ -366,10 +366,12 @@
     </div>
 
     <div class="donate-box">
-        <div class="donate-text-title" id="donate-title">Ủng hộ chi phí duy trì kênh</div>
+        <div class="donate-text-title" id="donate-title">Ủng hộ duy trì kênh</div>
         <div class="donate-text-sub" id="donate-content">
-            Ngân hàng: <strong id="donate-account-name">LE THI TUYET HOA</strong><br>
+            Ngân hàng: <strong id="donate-bank">MB Bank</strong><br>
+            Chủ tài khoản: <strong id="donate-account-name">LE THI TUYET HOA</strong><br>
             Số tài khoản: <strong class="stk" id="donate-account-number">9323082004</strong><br>
+            Ghi chú chuyển khoản: <strong id="donate-note">Ung ho Lu Yeu Phim</strong><br><br>
             <span id="donate-message">Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.</span>
         </div>
     </div>
@@ -402,6 +404,7 @@
     <div class="donate-modal">
         <div class="donate-modal-title" id="donate-modal-title">Ủng hộ duy trì kênh</div>
         <div class="donate-text-sub" id="donate-modal-content">
+            Ngân hàng: <strong id="donate-modal-bank">MB Bank</strong><br>
             Chủ tài khoản: <strong id="donate-modal-account-name">LE THI TUYET HOA</strong><br>
             Số tài khoản: <strong class="stk" id="donate-modal-account-number">9323082004</strong><br>
             Ghi chú chuyển khoản: <strong id="donate-modal-note">Ung ho Lu Yeu Phim</strong><br><br>
@@ -468,6 +471,7 @@ function useDefaultConfig() {
     siteConfig = {
         donate: {
             title: "Ủng hộ duy trì kênh",
+            bank: "MB Bank",
             accountName: "LE THI TUYET HOA",
             accountNumber: "9323082004",
             note: "Ung ho Lu Yeu Phim",
@@ -486,9 +490,12 @@ function updateDonateInfo() {
     if (!siteConfig || !siteConfig.donate) return;
     var d = siteConfig.donate;
     
-    // Update donate box
+    // Update donate box (mobile)
     var titleEl = document.getElementById('donate-title');
-    if (titleEl) titleEl.textContent = d.title || "Ủng hộ chi phí duy trì kênh";
+    if (titleEl) titleEl.textContent = d.title || "Ủng hộ duy trì kênh";
+    
+    var bankEl = document.getElementById('donate-bank');
+    if (bankEl) bankEl.textContent = d.bank || "MB Bank";
     
     var accountNameEl = document.getElementById('donate-account-name');
     if (accountNameEl) accountNameEl.textContent = d.accountName || "LE THI TUYET HOA";
@@ -496,12 +503,18 @@ function updateDonateInfo() {
     var accountNumberEl = document.getElementById('donate-account-number');
     if (accountNumberEl) accountNumberEl.textContent = d.accountNumber || "9323082004";
     
+    var noteEl = document.getElementById('donate-note');
+    if (noteEl) noteEl.textContent = d.note || "Ung ho Lu Yeu Phim";
+    
     var messageEl = document.getElementById('donate-message');
     if (messageEl) messageEl.textContent = d.message || "Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.";
     
     // Update donate modal
     var modalTitleEl = document.getElementById('donate-modal-title');
     if (modalTitleEl) modalTitleEl.textContent = d.title || "Ủng hộ duy trì kênh";
+    
+    var modalBankEl = document.getElementById('donate-modal-bank');
+    if (modalBankEl) modalBankEl.textContent = d.bank || "MB Bank";
     
     var modalAccountNameEl = document.getElementById('donate-modal-account-name');
     if (modalAccountNameEl) modalAccountNameEl.textContent = d.accountName || "LE THI TUYET HOA";
