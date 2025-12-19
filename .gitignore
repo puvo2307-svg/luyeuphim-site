@@ -1,5 +1,9 @@
 # Config files with sensitive data
 config.json
+drive_client_secret.json
+tokens/
+*.json
+!movies.json
 
 # Python
 __pycache__/
