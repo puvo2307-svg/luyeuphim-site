@@ -71,8 +71,13 @@ def export_sheet_to_json():
             
             # Khởi tạo phim nếu chưa có
             if film_name not in movies:
-                # Poster có thể nằm ở cột "Poster URL" hoặc "Poster"
-                poster_value = row.get('Poster URL', '').strip() or row.get('Poster', '').strip()
+                # Poster có thể nằm ở cột có tiêu đề chứa chữ \"Poster\" (Poster, Poster URL, ...)
+                poster_value = ''
+                for k, v in row.items():
+                    if k and 'Poster' in str(k):
+                        poster_value = (v or '').strip()
+                        if poster_value:
+                            break
 
                 movies[film_name] = {
                     'name': film_name,
@@ -118,8 +123,13 @@ def export_sheet_to_json():
                         # Lưu TOP nhỏ nhất (ưu tiên TOP 1, 2, 3...)
                         if current_top_int is None or new_top < current_top_int:
                             movies[film_name]['top'] = new_top
-            # Poster (cột J) - chấp nhận cả tiêu đề "Poster URL" hoặc "Poster"
-            poster_raw = row.get('Poster URL', '').strip() or row.get('Poster', '').strip()
+            # Poster (cột J) - chấp nhận mọi header chứa chữ \"Poster\"
+            poster_raw = ''
+            for k, v in row.items():
+                if k and 'Poster' in str(k):
+                    poster_raw = (v or '').strip()
+                    if poster_raw:
+                        break
             if poster_raw and not movies[film_name]['poster']:
                 movies[film_name]['poster'] = poster_raw
             if row.get('Năm', ''):
