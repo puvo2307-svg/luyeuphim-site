@@ -4,6 +4,7 @@ drive_client_secret.json
 tokens/
 *.json
 !movies.json
+!site-config.json
 
 # Python
 __pycache__/
