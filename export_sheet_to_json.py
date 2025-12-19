@@ -40,11 +40,25 @@ def export_sheet_to_json():
         for row in rows:
             film_name = row.get('Tên Bộ Phim', '').strip()
             if not film_name:
-                # Có thể là dòng banner (chỉ có cột N)
+                # Có thể là dòng banner (chỉ có cột O - Banner)
                 banner = row.get('Banner', '').strip()
                 if banner and banner.startswith('http'):
-                    if banner not in banners:
-                        banners.append(banner)
+                    # Kiểm tra xem banner này đã có chưa (tránh trùng)
+                    banner_exists = False
+                    for b in banners:
+                        if isinstance(b, dict) and b.get('url') == banner:
+                            banner_exists = True
+                            break
+                        elif isinstance(b, str) and b == banner:
+                            banner_exists = True
+                            break
+                    
+                    if not banner_exists:
+                        # Banner không gắn với phim nào (movieId = null)
+                        banners.append({
+                            'url': banner,
+                            'movieId': None
+                        })
                 continue
             
             ep = row.get('Số Tập')
@@ -97,17 +111,29 @@ def export_sheet_to_json():
             # Banner (cột O) - gắn với phim cụ thể
             banner = row.get('Banner', '').strip()
             if banner and banner.startswith('http'):
-                # Kiểm tra xem banner này đã có chưa (tránh trùng)
-                banner_exists = False
-                for b in banners:
+                # Tìm banner đã tồn tại (cùng URL)
+                existing_banner = None
+                for i, b in enumerate(banners):
                     if isinstance(b, dict) and b.get('url') == banner:
-                        banner_exists = True
+                        existing_banner = i
                         break
                     elif isinstance(b, str) and b == banner:
-                        banner_exists = True
+                        existing_banner = i
                         break
                 
-                if not banner_exists:
+                if existing_banner is not None:
+                    # Banner đã tồn tại → update movieId nếu chưa có
+                    if isinstance(banners[existing_banner], dict):
+                        if not banners[existing_banner].get('movieId') and film_name:
+                            banners[existing_banner]['movieId'] = film_name
+                    elif isinstance(banners[existing_banner], str):
+                        # Convert string thành dict và gắn movieId
+                        banners[existing_banner] = {
+                            'url': banner,
+                            'movieId': film_name if film_name else None
+                        }
+                else:
+                    # Banner mới → thêm vào
                     banners.append({
                         'url': banner,
                         'movieId': film_name  # Gắn banner với phim này
