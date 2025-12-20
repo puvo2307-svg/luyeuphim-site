@@ -1217,6 +1217,12 @@ function renderSearchResults(keyword) {
 // ========== LOAD PHIM ==========
 function getFirstEpisodeObj(episodes, preferredEp) {
     if (!episodes || !episodes.length) return null;
+    // Nếu preferredEp là "FULL" → tìm episode có ep === "FULL"
+    if (preferredEp === 'FULL' || preferredEp === 'full' || String(preferredEp).toUpperCase() === 'FULL') {
+        for (var i = 0; i < episodes.length; i++) {
+            if (episodes[i].ep === 'FULL' || episodes[i].ep === 'full') return episodes[i];
+        }
+    }
     var epNum = Number(preferredEp);
     if (!isNaN(epNum)) {
         for (var i = 0; i < episodes.length; i++) {
@@ -1348,7 +1354,8 @@ function loadMovieById(id, opts) {
     var activeEl = null;
     for (var i = 0; i < epList.children.length; i++) {
         var txt = epList.children[i].textContent || "";
-        if (txt.replace(/\s+/g, '').toLowerCase() === ("tập" + String(first.ep)).replace(/\s+/g, '').toLowerCase()) {
+        var firstEpText = (first.ep === 'FULL' || first.ep === 'full') ? 'FULL' : ("tập" + String(first.ep));
+        if (txt.replace(/\s+/g, '').toLowerCase() === firstEpText.replace(/\s+/g, '').toLowerCase()) {
             activeEl = epList.children[i];
             break;
         }
@@ -1406,24 +1413,27 @@ var currentExternalVideoUrl = null;
 
 function openExternalVideo() {
     if (currentExternalVideoUrl) {
-        // Nếu là tập 2+ → mở Shopee trước, sau đó mở fanpage
-        if (currentEpisode && currentEpisode > 1) {
-            // Mở Shopee trước
-            var shopeeLink = currentShopeeLink || myShopeeLink;
-            if (shopeeLink) {
-                console.log("Tập " + currentEpisode + " - Mở Shopee trước:", shopeeLink);
-                window.open(shopeeLink, "_blank");
-                // Đợi 500ms rồi mở fanpage
-                setTimeout(function() {
-                    console.log("Tập " + currentEpisode + " - Mở fanpage sau:", currentExternalVideoUrl);
-                    window.open(currentExternalVideoUrl, "_blank");
-                }, 500);
-            } else {
-                // Không có Shopee link → mở fanpage luôn
+        // Tập 1 → chỉ mở link (không có Shopee)
+        if (currentEpisode === 1) {
+            window.open(currentExternalVideoUrl, "_blank");
+            return;
+        }
+        
+        // Tập 2+ hoặc FULL → mở Shopee trước (nếu có), sau đó mở link
+        var shopeeLink = currentShopeeLink || myShopeeLink;
+        
+        // Kiểm tra shopeeLink có hợp lệ không (không rỗng, không null, không undefined)
+        if (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null' && shopeeLink.trim() !== 'undefined' && shopeeLink.trim() !== '') {
+            console.log("Tập " + currentEpisode + " - Mở Shopee trước:", shopeeLink);
+            window.open(shopeeLink.trim(), "_blank");
+            // Đợi 500ms rồi mở link
+            setTimeout(function() {
+                console.log("Tập " + currentEpisode + " - Mở link sau:", currentExternalVideoUrl);
                 window.open(currentExternalVideoUrl, "_blank");
-            }
+            }, 500);
         } else {
-            // Tập 1 → chỉ mở fanpage (không có Shopee)
+            // Không có Shopee link hoặc Shopee link rỗng → mở link luôn
+            console.log("Tập " + currentEpisode + " - Không có Shopee link, mở link luôn:", currentExternalVideoUrl);
             window.open(currentExternalVideoUrl, "_blank");
         }
     }
@@ -1435,14 +1445,19 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
     var placeholder = document.getElementById('external-video-placeholder');
     var placeholderThumb = document.getElementById('external-video-thumbnail');
     
-    currentEpisode = Number(epNum);
+    // Xử lý "FULL" - giữ nguyên string, không convert sang số
+    if (epNum === 'FULL' || epNum === 'full' || String(epNum).toUpperCase() === 'FULL') {
+        currentEpisode = 'FULL';
+    } else {
+        currentEpisode = Number(epNum);
+    }
     
     // Set link Shopee cho tập này
     if (currentEpisode === 1) {
         currentShopeeLink = null; // Tập 1 không có Shopee
     } else {
-        // Từ tập 2 trở đi: dùng link riêng hoặc mặc định
-        currentShopeeLink = (shopeeLink && shopeeLink.trim()) ? shopeeLink.trim() : myShopeeLink;
+        // Từ tập 2 trở đi và FULL: dùng link riêng hoặc mặc định
+        currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
     }
     
     // Tập 1: KHÔNG hiện Shopee overlay
