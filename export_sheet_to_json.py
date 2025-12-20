@@ -199,32 +199,57 @@ def export_sheet_to_json():
                         existing_ep['embedUrl'] = embed_url
                     if video_url and not existing_ep.get('videoUrl'):
                         existing_ep['videoUrl'] = video_url
+                    # Update shopeeLink nếu có
+                    if shopee_link and not existing_ep.get('shopeeLink'):
+                        existing_ep['shopeeLink'] = shopee_link if shopee_link else None
+                    # Update uploadDate nếu có
+                    upload_date = row.get('Ngày Upload', '').strip()
+                    if upload_date and not existing_ep.get('uploadDate'):
+                        existing_ep['uploadDate'] = upload_date
                     episode_exists = True
-                    break
+                    break  # Quan trọng: break ngay để không append
             
             # Chỉ thêm episode mới nếu chưa tồn tại
             if not episode_exists:
                 movies[film_name]['episodes'].append({
                     'ep': ep_num,
                     'embedUrl': embed_url,
-                    'videoUrl': row.get('Link Dailymotion', '').strip(),
+                    'videoUrl': video_url,
                     'uploadDate': row.get('Ngày Upload', '').strip(),
                     'shopeeLink': shopee_link if shopee_link else None
                 })
         
-        # Sort episodes cho mỗi phim và loại bỏ duplicate (giữ lại episode đầu tiên)
+        # Sort episodes cho mỗi phim và loại bỏ duplicate (giữ lại episode đầu tiên có đầy đủ thông tin)
         for film in movies.values():
             # Sort theo số tập
             film['episodes'].sort(key=lambda x: x['ep'])
             
-            # Loại bỏ duplicate dựa trên ep number (giữ lại episode đầu tiên)
+            # Loại bỏ duplicate dựa trên ep number
+            # Ưu tiên giữ lại episode có embedUrl hoặc videoUrl (đầy đủ thông tin hơn)
             seen_eps = {}
             unique_episodes = []
             for ep in film['episodes']:
                 ep_num = ep['ep']
                 if ep_num not in seen_eps:
-                    seen_eps[ep_num] = True
+                    # Episode đầu tiên → giữ lại
+                    seen_eps[ep_num] = ep
                     unique_episodes.append(ep)
+                else:
+                    # Episode duplicate → so sánh và giữ lại episode tốt hơn
+                    existing_ep = seen_eps[ep_num]
+                    # Ưu tiên episode có embedUrl hoặc videoUrl
+                    ep_has_content = bool(ep.get('embedUrl') or ep.get('videoUrl'))
+                    existing_has_content = bool(existing_ep.get('embedUrl') or existing_ep.get('videoUrl'))
+                    
+                    if ep_has_content and not existing_has_content:
+                        # Episode mới tốt hơn → thay thế
+                        unique_episodes.remove(existing_ep)
+                        unique_episodes.append(ep)
+                        seen_eps[ep_num] = ep
+                    # Nếu cả 2 đều có hoặc đều không có → giữ lại episode đầu tiên (không làm gì)
+            
+            # Sort lại sau khi loại bỏ duplicate
+            unique_episodes.sort(key=lambda x: x['ep'])
             film['episodes'] = unique_episodes
             
             # Kế thừa shopeeLink: nếu tập không có link riêng thì dùng link của tập trước
