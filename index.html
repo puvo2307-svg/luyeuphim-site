@@ -1048,22 +1048,35 @@ var currentGenreTab = null;
 var availableGenres = [];
 
 function initGenreTabs() {
+    console.log("🔍 initGenreTabs() được gọi");
+    console.log("📊 Tổng số phim trong movieIndex:", Object.keys(movieIndex).length);
+    
     // Thu thập tất cả thể loại từ movieIndex
     var genreSet = new Set();
+    var moviesWithGenre = 0;
     Object.keys(movieIndex).forEach(function(id) {
         var data = movieIndex[id];
+        console.log("  Phim:", id, "Genre:", data.genre || "(không có)");
         if (data.genre && data.genre.trim()) {
             genreSet.add(data.genre.trim());
+            moviesWithGenre++;
         }
     });
+    
+    console.log("📝 Số phim có genre:", moviesWithGenre);
+    console.log("📝 Các thể loại tìm thấy:", Array.from(genreSet));
     
     availableGenres = Array.from(genreSet).sort();
     
     var tabsContainer = document.getElementById('genre-tabs');
     var section = document.getElementById('genre-section');
     
-    if (!tabsContainer || !section) {
-        console.log("❌ Không tìm thấy genre-tabs hoặc genre-section");
+    if (!tabsContainer) {
+        console.log("❌ Không tìm thấy genre-tabs element");
+        return;
+    }
+    if (!section) {
+        console.log("❌ Không tìm thấy genre-section element");
         return;
     }
     
@@ -1072,7 +1085,7 @@ function initGenreTabs() {
     if (availableGenres.length === 0) {
         // Không có thể loại nào → ẩn section
         section.style.display = "none";
-        console.log("⚠️ Không có thể loại nào trong dữ liệu");
+        console.log("⚠️ Không có thể loại nào trong dữ liệu → Ẩn section");
         return;
     }
     
