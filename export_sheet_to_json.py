@@ -10,6 +10,7 @@ from google.oauth2.service_account import Credentials
 import json
 import os
 import sys
+import re
 
 # Config
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -64,6 +65,16 @@ def export_sheet_to_json():
             ep = row.get('Số Tập')
             if ep is None or ep == '':
                 continue
+            
+            # Parse số tập: có thể là "1", "2", "Tập 1", "Tập 2", v.v.
+            ep_str = str(ep).strip()
+            ep_match = re.search(r'(\d+)', ep_str)  # Tìm số đầu tiên
+            if not ep_match:
+                continue  # Không có số → skip
+            try:
+                ep_num = int(ep_match.group(1))
+            except:
+                continue  # Parse lỗi → skip
             
             # Lấy embedUrl và videoUrl (có thể là string hoặc None)
             embed_url_raw = row.get('Embed URL')
@@ -183,12 +194,6 @@ def export_sheet_to_json():
                         'movieId': film_name  # Gắn banner với phim này
                     })
             
-            # Thêm tập
-            try:
-                ep_num = int(ep) if isinstance(ep, (int, float)) else int(str(ep).strip())
-            except:
-                ep_num = 0
-            
             # Cột P: Link Shopee cho từng tập
             shopee_link = row.get('Shopee Link', '').strip()
             # Tập 1 luôn không có Shopee
@@ -201,31 +206,52 @@ def export_sheet_to_json():
                 movies[film_name]['episodes_dict'] = {}  # Dict để check duplicate nhanh hơn
             
             ep_key = ep_num
+            current_episode_data = {
+                'ep': ep_num,
+                'embedUrl': embed_url,
+                'videoUrl': video_url,
+                'uploadDate': str(row.get('Ngày Upload', '')).strip() if row.get('Ngày Upload') else '',
+                'shopeeLink': shopee_link if shopee_link else None
+            }
+            
             if ep_key in movies[film_name]['episodes_dict']:
-                # Episode đã tồn tại → update nếu có thông tin tốt hơn
+                # Episode đã tồn tại → so sánh và giữ lại episode tốt hơn
                 existing_ep = movies[film_name]['episodes_dict'][ep_key]
-                if embed_url and not existing_ep.get('embedUrl'):
-                    existing_ep['embedUrl'] = embed_url
-                if video_url and not existing_ep.get('videoUrl'):
-                    existing_ep['videoUrl'] = video_url
-                if shopee_link and not existing_ep.get('shopeeLink'):
-                    existing_ep['shopeeLink'] = shopee_link if shopee_link else None
-                upload_date = row.get('Ngày Upload', '')
-                if upload_date:
-                    upload_date_str = str(upload_date).strip() if upload_date else ''
-                    if upload_date_str and not existing_ep.get('uploadDate'):
-                        existing_ep['uploadDate'] = upload_date_str
+                # Đếm số field có giá trị của episode hiện tại và episode mới
+                existing_count = sum([
+                    1 if existing_ep.get('embedUrl') else 0,
+                    1 if existing_ep.get('videoUrl') else 0,
+                    1 if existing_ep.get('uploadDate') else 0
+                ])
+                current_count = sum([
+                    1 if current_episode_data.get('embedUrl') else 0,
+                    1 if current_episode_data.get('videoUrl') else 0,
+                    1 if current_episode_data.get('uploadDate') else 0
+                ])
+                
+                # Ưu tiên episode có nhiều thông tin hơn, hoặc nếu bằng nhau thì ưu tiên episode mới
+                if current_count > existing_count:
+                    # Episode mới tốt hơn → thay thế
+                    movies[film_name]['episodes_dict'][ep_key] = current_episode_data
+                    # Tìm và thay thế trong list
+                    for i, ep in enumerate(movies[film_name]['episodes']):
+                        if ep['ep'] == ep_num:
+                            movies[film_name]['episodes'][i] = current_episode_data
+                            break
+                elif current_count == existing_count:
+                    # Bằng nhau → merge: lấy giá trị từ episode nào có
+                    if embed_url and not existing_ep.get('embedUrl'):
+                        existing_ep['embedUrl'] = embed_url
+                    if video_url and not existing_ep.get('videoUrl'):
+                        existing_ep['videoUrl'] = video_url
+                    if current_episode_data.get('uploadDate') and not existing_ep.get('uploadDate'):
+                        existing_ep['uploadDate'] = current_episode_data['uploadDate']
+                    if shopee_link and not existing_ep.get('shopeeLink'):
+                        existing_ep['shopeeLink'] = shopee_link if shopee_link else None
             else:
                 # Episode mới → thêm vào dict và list
-                new_ep = {
-                    'ep': ep_num,
-                    'embedUrl': embed_url,
-                    'videoUrl': video_url,
-                    'uploadDate': str(row.get('Ngày Upload', '')).strip() if row.get('Ngày Upload') else '',
-                    'shopeeLink': shopee_link if shopee_link else None
-                }
-                movies[film_name]['episodes_dict'][ep_key] = new_ep
-                movies[film_name]['episodes'].append(new_ep)
+                movies[film_name]['episodes_dict'][ep_key] = current_episode_data
+                movies[film_name]['episodes'].append(current_episode_data)
         
         # Sort episodes cho mỗi phim (đã loại bỏ duplicate bằng dict ở trên)
         for film in movies.values():
