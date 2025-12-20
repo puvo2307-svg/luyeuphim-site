@@ -306,13 +306,21 @@ def export_sheet_to_json():
                 movies[film_name]['episodes'].append(current_episode_data)
         
         # Sort episodes cho mỗi phim (đã loại bỏ duplicate bằng dict ở trên)
-        for film in movies.values():
+        for film_name, film in movies.items():
             # Xóa episodes_dict (không cần nữa)
             if 'episodes_dict' in film:
                 del film['episodes_dict']
             
             # Sort theo số tập
             film['episodes'].sort(key=lambda x: x['ep'])
+            
+            # Debug: kiểm tra tập 1 sau khi sort
+            ep1_list = [ep for ep in film['episodes'] if ep.get('ep') == 1]
+            if ep1_list:
+                ep1 = ep1_list[0]
+                print(f"  ✅ Sau khi sort - {film_name}: Tập 1 có videoUrl={bool(ep1.get('videoUrl'))}, embedUrl={bool(ep1.get('embedUrl'))}")
+            else:
+                print(f"  ⚠️  Sau khi sort - {film_name}: KHÔNG CÓ TẬP 1!")
             
             # Kế thừa shopeeLink: nếu tập không có link riêng thì dùng link của tập trước
             last_shopee_link = None
