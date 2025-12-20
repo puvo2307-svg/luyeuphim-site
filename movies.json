@@ -162,15 +162,15 @@
       "allowPC": false,
       "episodes": [
         {
-          "ep": 1,
+          "ep": "FULL",
           "embedUrl": "",
           "videoUrl": "https://www.facebook.com/share/v/17jCwETF5H/",
           "uploadDate": "2025-12-20",
-          "shopeeLink": null
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T08:42:00.803580"
+  "updated": "2025-12-20T08:47:51.513497"
 }
