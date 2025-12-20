@@ -1040,6 +1040,117 @@ function renderTopMovies() {
     if (pcSection) pcSection.style.display = "block";
 }
 
+// ========== PHIM THEO THỂ LOẠI ==========
+var currentGenreTab = 'Cổ Trang';
+
+function switchGenreTab(genre) {
+    currentGenreTab = genre;
+    
+    // Update active tab
+    var tabs = document.querySelectorAll('.genre-tab');
+    tabs.forEach(function(tab) {
+        if (tab.getAttribute('data-genre') === genre) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
+    // Render phim theo thể loại
+    renderGenreMovies(genre);
+}
+
+function renderGenreMovies(genre) {
+    var gridEl = document.getElementById('genre-grid');
+    if (!gridEl) return;
+    
+    gridEl.innerHTML = "";
+    
+    var entries = [];
+    Object.keys(movieIndex).forEach(function(id) {
+        var data = movieIndex[id];
+        // Kiểm tra thể loại khớp
+        if (data.genre && data.genre.trim() === genre) {
+            // Lấy uploadDate mới nhất từ episodes
+            var latestUploadDate = null;
+            if (data.episodes && data.episodes.length > 0) {
+                data.episodes.forEach(function(ep) {
+                    if (ep.uploadDate && ep.uploadDate.trim()) {
+                        var epDate = ep.uploadDate.trim();
+                        if (!latestUploadDate || epDate > latestUploadDate) {
+                            latestUploadDate = epDate;
+                        }
+                    }
+                });
+            }
+            
+            entries.push({
+                id: id,
+                name: data.displayName || id,
+                poster: data.poster,
+                uploadDate: latestUploadDate || '1970-01-01' // Nếu không có date thì đặt mặc định cũ
+            });
+        }
+    });
+    
+    // Sắp xếp theo uploadDate mới nhất (giảm dần)
+    entries.sort(function(a, b) {
+        return b.uploadDate.localeCompare(a.uploadDate);
+    });
+    
+    if (!entries.length) {
+        gridEl.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Chưa có phim thể loại "' + genre + '"</div>';
+        return;
+    }
+    
+    // Helper tạo card (giống TOP)
+    function createGenreCard(item) {
+        var card = document.createElement('div');
+        card.className = 'top-card';
+        card.onclick = function() { loadMovieById(item.id); };
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'top-card-wrapper';
+
+        // Nếu có poster thì hiện ảnh, không thì hiện "No Pic"
+        if (item.poster && item.poster.trim()) {
+            var img = document.createElement('img');
+            img.className = 'top-card-img';
+            img.src = item.poster;
+            img.alt = item.name;
+            img.onerror = function() {
+                // Nếu ảnh lỗi thì thay bằng No Pic
+                var nopic = document.createElement('div');
+                nopic.className = 'top-card-nopic';
+                nopic.textContent = 'No Pic';
+                this.parentNode.replaceChild(nopic, this);
+            };
+            wrapper.appendChild(img);
+        } else {
+            var nopic = document.createElement('div');
+            nopic.className = 'top-card-nopic';
+            nopic.textContent = 'No Pic';
+            wrapper.appendChild(nopic);
+        }
+
+        var nameDiv = document.createElement('div');
+        nameDiv.className = 'top-card-name';
+        nameDiv.textContent = item.name;
+
+        card.appendChild(wrapper);
+        card.appendChild(nameDiv);
+        return card;
+    }
+    
+    entries.forEach(function(item) {
+        gridEl.appendChild(createGenreCard(item));
+    });
+    
+    // Hiển thị section
+    var section = document.getElementById('genre-section');
+    if (section) section.style.display = "block";
+}
+
 // ========== BANNER CAROUSEL ==========
 var currentBannerIndex = 0;
 var bannerInterval = null;
