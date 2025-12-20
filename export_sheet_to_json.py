@@ -68,15 +68,21 @@ def export_sheet_to_json():
             if ep is None or ep == '':
                 continue
             
-            # Parse số tập: có thể là "1", "2", "Tập 1", "Tập 2", v.v.
-            ep_str = str(ep).strip()
-            ep_match = re.search(r'(\d+)', ep_str)  # Tìm số đầu tiên
-            if not ep_match:
-                continue  # Không có số → skip
-            try:
-                ep_num = int(ep_match.group(1))
-            except:
-                continue  # Parse lỗi → skip
+            # Parse số tập: có thể là "1", "2", "Tập 1", "Tập 2", "FULL", v.v.
+            ep_str = str(ep).strip().upper()
+            
+            # Kiểm tra nếu là "FULL"
+            if ep_str == 'FULL' or ep_str == 'FULL TẬP' or ep_str == 'FULL TAP':
+                ep_num = 'FULL'  # Dùng string "FULL" làm identifier
+            else:
+                # Tìm số trong chuỗi
+                ep_match = re.search(r'(\d+)', ep_str)
+                if not ep_match:
+                    continue  # Không có số và không phải FULL → skip
+                try:
+                    ep_num = int(ep_match.group(1))
+                except:
+                    continue  # Parse lỗi → skip
             
             # Lấy embedUrl và videoUrl (có thể là string hoặc None)
             embed_url_raw = row.get('Embed URL')

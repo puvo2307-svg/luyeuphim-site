@@ -1291,7 +1291,12 @@ function loadMovieById(id, opts) {
     episodes.forEach(function(item) {
         var div = document.createElement('div');
         div.className = 'ep-item';
-        div.textContent = "Tập " + item.ep;
+        // Hiển thị "FULL" nếu ep là "FULL", ngược lại hiển thị "Tập X"
+        if (item.ep === 'FULL' || item.ep === 'full') {
+            div.textContent = "FULL";
+        } else {
+            div.textContent = "Tập " + item.ep;
+        }
         div.onclick = function() {
             changeEpisode(item.ep, item.embedUrl, data.displayName || id, this, id, item.shopeeLink, item.videoUrl);
         };
