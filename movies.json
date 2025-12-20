@@ -19,20 +19,6 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         },
         {
-          "ep": 2,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0f8g",
-          "videoUrl": "",
-          "uploadDate": "2025-12-19",
-          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
-        },
-        {
-          "ep": 3,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fhy",
-          "videoUrl": "",
-          "uploadDate": "2025-12-19",
-          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
-        },
-        {
           "ep": 3,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fhy",
           "videoUrl": "",
@@ -60,20 +46,6 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         },
         {
-          "ep": 2,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0lh2",
-          "videoUrl": "",
-          "uploadDate": "2025-12-19",
-          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
-        },
-        {
-          "ep": 3,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fts",
-          "videoUrl": "",
-          "uploadDate": "2025-12-19",
-          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
-        },
-        {
           "ep": 3,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fts",
           "videoUrl": "",
@@ -81,8 +53,35 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
+    },
+    {
+      "name": "Võ Công Giả Dị Năng",
+      "vietName": "Võ Công Giả Dị Năng",
+      "summary": "Cuộc sống bình yên của Thạch Kiến Minh và Diệp Kiều bỗng chốc bị phá vỡ khi Phái Hàn Sơn do Phong Nhất Hàn cùng mẹ con ông ta tìm đến trả thù. Dị năng giả Cục Thần Ẩn đã nhân cơ hội này ra tay đàn áp võ giả, buộc Thạch Kiến Minh phải trở lại giang hồ. Một trận chiến sinh tử nổ ra hé lộ âm mưu chấn động, thay đổi vận mệnh võ lâm.",
+      "top": "",
+      "poster": "https://bbs.dyyjmax.org/assets/files/2025-09-29/1759163435-393686-71.jpg",
+      "year": 2025,
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2dya",
+          "videoUrl": "",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2dyi",
+          "videoUrl": "",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        }
+      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T02:46:52.238123"
+  "updated": "2025-12-20T03:21:58.603048"
 }
