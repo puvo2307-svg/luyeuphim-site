@@ -1596,17 +1596,28 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
             console.log(`Tập ${currentEpisode} - LỖI: Không tìm thấy placeholder element!`);
         }
     } else {
-        // Tập 2+ hoặc không có videoUrl ngoài → dùng Dailymotion player
+        // Không có link fanpage/YouTube → dùng Dailymotion player (nếu có embedUrl Dailymotion)
         currentExternalVideoUrl = null;
         if (placeholder) placeholder.classList.remove('active');
-        if (player) {
-            player.style.display = 'block';
-            var src = String(source || "");
-            if (!src.startsWith("http")) {
-                // Bật autoplay (mute=1 để tương thích mobile)
-                src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
+        
+        // Chỉ hiển thị player nếu có embedUrl Dailymotion chuẩn
+        if (isDailymotionEmbed && embedUrlStr) {
+            if (player) {
+                player.style.display = 'block';
+                var src = String(embedUrlStr);
+                // Đảm bảo embedUrl có autoplay
+                if (!src.includes('autoplay=')) {
+                    src += (src.includes('?') ? '&' : '?') + 'autoplay=1&mute=0';
+                }
+                player.src = src;
+                console.log(`Tập ${currentEpisode} - Hiển thị Dailymotion player:`, src);
             }
-            player.src = src;
+        } else {
+            // Không có embedUrl Dailymotion → ẩn player
+            if (player) {
+                player.style.display = 'none';
+                console.log(`Tập ${currentEpisode} - Không có embedUrl Dailymotion, ẩn player`);
+            }
         }
     }
 
