@@ -322,10 +322,21 @@ def export_sheet_to_json():
             'updated': __import__('datetime').datetime.now().isoformat()
         }
         
+        # Debug: đếm số tập 1 trong JSON output
+        total_ep1 = 0
+        for m in movies_list:
+            ep1_count = sum(1 for ep in m.get('episodes', []) if ep.get('ep') == 1)
+            if ep1_count > 0:
+                print(f"  📺 {m['name']}: có {ep1_count} tập 1")
+                total_ep1 += ep1_count
+        
         with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
             json.dump(output, f, ensure_ascii=False, indent=2)
         
         print(f"✅ Exported {len(movies_list)} movies, {len(banners)} banners to {OUTPUT_FILE}")
+        print(f"📺 Tổng số tập 1 trong JSON: {total_ep1}")
+        if total_ep1 == 0:
+            print("⚠️  CẢNH BÁO: Không có tập 1 nào được export!")
         return True
         
     except Exception as e:
