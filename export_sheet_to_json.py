@@ -300,6 +300,8 @@ def export_sheet_to_json():
                             existing_ep['shopeeLink'] = shopee_link if shopee_link else None
             else:
                 # Episode mới → thêm vào dict và list
+                if ep_num == 1:
+                    print(f"  ➕ Thêm tập 1 mới: {film_name} - videoUrl={bool(video_url)}, embedUrl={bool(embed_url)}")
                 movies[film_name]['episodes_dict'][ep_key] = current_episode_data
                 movies[film_name]['episodes'].append(current_episode_data)
         
