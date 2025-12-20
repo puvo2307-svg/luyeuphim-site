@@ -1441,6 +1441,24 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         if (player) player.style.display = 'none';
         if (placeholder) {
             placeholder.classList.add('active');
+            console.log("Tập 1 - Placeholder đã được kích hoạt");
+            
+            // Đảm bảo nút play và label LUÔN hiển thị (dù có poster hay không)
+            var playBtn = document.getElementById('external-video-play-btn');
+            var label = document.getElementById('external-video-label');
+            if (playBtn) {
+                playBtn.style.display = 'flex';
+                playBtn.style.visibility = 'visible';
+                playBtn.style.opacity = '1';
+                console.log("Tập 1 - Nút play đã hiển thị");
+            }
+            if (label) {
+                label.style.display = 'block';
+                label.style.visibility = 'visible';
+                label.style.opacity = '1';
+                console.log("Tập 1 - Label đã hiển thị");
+            }
+            
             // Lấy poster từ movieIndex nếu có
             if (movieId && movieIndex[movieId] && movieIndex[movieId].poster) {
                 var posterUrl = movieIndex[movieId].poster.trim();
@@ -1449,19 +1467,19 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
                     placeholderThumb.src = posterUrl;
                     placeholderThumb.style.display = 'block';
                     placeholderThumb.onerror = function() {
-                        console.log("Tập 1 - Poster load error");
+                        console.log("Tập 1 - Poster load error, ẩn thumbnail");
                         this.style.display = 'none';
                     };
                 } else {
-                    console.log("Tập 1 - Không có poster URL");
+                    console.log("Tập 1 - Không có poster URL, ẩn thumbnail");
                     placeholderThumb.style.display = 'none';
                 }
             } else {
-                console.log("Tập 1 - Không tìm thấy movieId hoặc poster trong movieIndex");
+                console.log("Tập 1 - Không tìm thấy movieId hoặc poster trong movieIndex, ẩn thumbnail");
                 placeholderThumb.style.display = 'none';
             }
         } else {
-            console.log("Tập 1 - Không tìm thấy placeholder element");
+            console.log("Tập 1 - LỖI: Không tìm thấy placeholder element!");
         }
     } else {
         // Tập 2+ hoặc không có videoUrl ngoài → dùng Dailymotion player
