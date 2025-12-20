@@ -19,6 +19,20 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         },
         {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0f8g",
+          "videoUrl": "",
+          "uploadDate": "2025-12-19",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fhy",
+          "videoUrl": "",
+          "uploadDate": "2025-12-19",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
+        },
+        {
           "ep": 3,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fhy",
           "videoUrl": "",
@@ -46,6 +60,20 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         },
         {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0lh2",
+          "videoUrl": "",
+          "uploadDate": "2025-12-19",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fts",
+          "videoUrl": "",
+          "uploadDate": "2025-12-19",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
+        },
+        {
           "ep": 3,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0fts",
           "videoUrl": "",
@@ -56,5 +84,5 @@
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T02:34:01.966139"
+  "updated": "2025-12-20T02:46:52.238123"
 }
