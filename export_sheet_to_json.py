@@ -65,8 +65,13 @@ def export_sheet_to_json():
             if ep is None or ep == '':
                 continue
             
-            embed_url = row.get('Embed URL', '').strip()
-            video_url = row.get('Link Dailymotion', '').strip()
+            # Lấy embedUrl và videoUrl (có thể là string hoặc None)
+            embed_url_raw = row.get('Embed URL')
+            video_url_raw = row.get('Link Dailymotion')
+            
+            # Convert sang string và strip
+            embed_url = str(embed_url_raw).strip() if embed_url_raw else ''
+            video_url = str(video_url_raw).strip() if video_url_raw else ''
             
             # Nếu không có Embed URL và cũng không có Link Dailymotion → skip
             if not embed_url and not video_url:
@@ -190,67 +195,46 @@ def export_sheet_to_json():
             if ep_num == 1:
                 shopee_link = None
             
-            # Kiểm tra xem episode này đã tồn tại chưa (tránh duplicate)
-            episode_exists = False
-            for existing_ep in movies[film_name]['episodes']:
-                if existing_ep['ep'] == ep_num:
-                    # Nếu episode đã tồn tại, chỉ update nếu episode mới có embedUrl/videoUrl tốt hơn
-                    if embed_url and not existing_ep.get('embedUrl'):
-                        existing_ep['embedUrl'] = embed_url
-                    if video_url and not existing_ep.get('videoUrl'):
-                        existing_ep['videoUrl'] = video_url
-                    # Update shopeeLink nếu có
-                    if shopee_link and not existing_ep.get('shopeeLink'):
-                        existing_ep['shopeeLink'] = shopee_link if shopee_link else None
-                    # Update uploadDate nếu có
-                    upload_date = row.get('Ngày Upload', '').strip()
-                    if upload_date and not existing_ep.get('uploadDate'):
-                        existing_ep['uploadDate'] = upload_date
-                    episode_exists = True
-                    break  # Quan trọng: break ngay để không append
+            # Kiểm tra xem episode này đã tồn tại chưa (tránh duplicate) - DÙNG DICTIONARY ĐỂ TRÁNH DUPLICATE
+            # Tạo key unique cho episode: ep_num
+            if 'episodes_dict' not in movies[film_name]:
+                movies[film_name]['episodes_dict'] = {}  # Dict để check duplicate nhanh hơn
             
-            # Chỉ thêm episode mới nếu chưa tồn tại
-            if not episode_exists:
-                movies[film_name]['episodes'].append({
+            ep_key = ep_num
+            if ep_key in movies[film_name]['episodes_dict']:
+                # Episode đã tồn tại → update nếu có thông tin tốt hơn
+                existing_ep = movies[film_name]['episodes_dict'][ep_key]
+                if embed_url and not existing_ep.get('embedUrl'):
+                    existing_ep['embedUrl'] = embed_url
+                if video_url and not existing_ep.get('videoUrl'):
+                    existing_ep['videoUrl'] = video_url
+                if shopee_link and not existing_ep.get('shopeeLink'):
+                    existing_ep['shopeeLink'] = shopee_link if shopee_link else None
+                upload_date = row.get('Ngày Upload', '')
+                if upload_date:
+                    upload_date_str = str(upload_date).strip() if upload_date else ''
+                    if upload_date_str and not existing_ep.get('uploadDate'):
+                        existing_ep['uploadDate'] = upload_date_str
+            else:
+                # Episode mới → thêm vào dict và list
+                new_ep = {
                     'ep': ep_num,
                     'embedUrl': embed_url,
                     'videoUrl': video_url,
-                    'uploadDate': row.get('Ngày Upload', '').strip(),
+                    'uploadDate': str(row.get('Ngày Upload', '')).strip() if row.get('Ngày Upload') else '',
                     'shopeeLink': shopee_link if shopee_link else None
-                })
+                }
+                movies[film_name]['episodes_dict'][ep_key] = new_ep
+                movies[film_name]['episodes'].append(new_ep)
         
-        # Sort episodes cho mỗi phim và loại bỏ duplicate (giữ lại episode đầu tiên có đầy đủ thông tin)
+        # Sort episodes cho mỗi phim (đã loại bỏ duplicate bằng dict ở trên)
         for film in movies.values():
+            # Xóa episodes_dict (không cần nữa)
+            if 'episodes_dict' in film:
+                del film['episodes_dict']
+            
             # Sort theo số tập
             film['episodes'].sort(key=lambda x: x['ep'])
-            
-            # Loại bỏ duplicate dựa trên ep number
-            # Ưu tiên giữ lại episode có embedUrl hoặc videoUrl (đầy đủ thông tin hơn)
-            seen_eps = {}
-            unique_episodes = []
-            for ep in film['episodes']:
-                ep_num = ep['ep']
-                if ep_num not in seen_eps:
-                    # Episode đầu tiên → giữ lại
-                    seen_eps[ep_num] = ep
-                    unique_episodes.append(ep)
-                else:
-                    # Episode duplicate → so sánh và giữ lại episode tốt hơn
-                    existing_ep = seen_eps[ep_num]
-                    # Ưu tiên episode có embedUrl hoặc videoUrl
-                    ep_has_content = bool(ep.get('embedUrl') or ep.get('videoUrl'))
-                    existing_has_content = bool(existing_ep.get('embedUrl') or existing_ep.get('videoUrl'))
-                    
-                    if ep_has_content and not existing_has_content:
-                        # Episode mới tốt hơn → thay thế
-                        unique_episodes.remove(existing_ep)
-                        unique_episodes.append(ep)
-                        seen_eps[ep_num] = ep
-                    # Nếu cả 2 đều có hoặc đều không có → giữ lại episode đầu tiên (không làm gì)
-            
-            # Sort lại sau khi loại bỏ duplicate
-            unique_episodes.sort(key=lambda x: x['ep'])
-            film['episodes'] = unique_episodes
             
             # Kế thừa shopeeLink: nếu tập không có link riêng thì dùng link của tập trước
             last_shopee_link = None
