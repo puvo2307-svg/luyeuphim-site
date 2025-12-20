@@ -1503,9 +1503,11 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
                 console.log(`Tập ${currentEpisode} - Nút play đã hiển thị`);
             }
             if (label) {
-                // Tập 1: "Xem trên Fanpage", Tập 2+: "Mở Shopee & Xem trên Fanpage"
+                // Tập 1: "Xem trên Fanpage", Tập 2+ và FULL: "Mở Shopee & Xem trên Fanpage"
                 if (currentEpisode === 1) {
                     label.textContent = 'Xem trên Fanpage';
+                } else if (currentEpisode === 'FULL') {
+                    label.textContent = '🛒 Mở Shopee & Xem FULL';
                 } else {
                     label.textContent = '🛒 Mở Shopee & Xem trên Fanpage';
                 }
