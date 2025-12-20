@@ -13,8 +13,8 @@
       "episodes": [
         {
           "ep": 1,
-          "embedUrl": "https://www.facebook.com/reel/903462675696714/",
-          "videoUrl": "",
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/reel/903462675696714/",
           "uploadDate": "2025-12-19",
           "shopeeLink": null
         },
@@ -47,8 +47,8 @@
       "episodes": [
         {
           "ep": 1,
-          "embedUrl": "https://www.facebook.com/reel/13609480783808255",
-          "videoUrl": "",
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/reel/13609480783808255",
           "uploadDate": "2025-12-19",
           "shopeeLink": null
         },
@@ -81,15 +81,36 @@
       "episodes": [
         {
           "ep": 1,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2dya",
-          "videoUrl": "",
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/1BXE4m9CTV/",
           "uploadDate": "2025-12-20",
           "shopeeLink": null
         },
         {
           "ep": 2,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2dyi",
-          "videoUrl": "",
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/14P5E4P5i74/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/1BookFpYDN/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        },
+        {
+          "ep": 4,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/1EmJnPpX9f/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        },
+        {
+          "ep": 5,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/17TcV77TyZ/",
           "uploadDate": "2025-12-20",
           "shopeeLink": null
         }
@@ -97,5 +118,5 @@
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T04:33:11.434157"
+  "updated": "2025-12-20T04:51:06.621962"
 }
