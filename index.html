@@ -885,8 +885,12 @@ function loadMoviesFromSheetFallback() {
                 
                 // Thể loại (cột L, index 11)
                 var genre = (cells[11] && cells[11].v) ? String(cells[11].v).trim() : "";
-                if (genre && !movieIndex[filmA].genre) {
-                    movieIndex[filmA].genre = genre;
+                if (genre) {
+                    // Luôn cập nhật genre (có thể có nhiều hàng, lấy giá trị đầu tiên)
+                    if (!movieIndex[filmA].genre) {
+                        movieIndex[filmA].genre = genre;
+                        console.log("📝 Set genre cho", filmA, ":", genre);
+                    }
                 }
 
                 // Collect banners - gắn với phim cụ thể
@@ -1063,15 +1067,29 @@ function switchGenreTab(genre) {
 
 function renderGenreMovies(genre) {
     var gridEl = document.getElementById('genre-grid');
-    if (!gridEl) return;
+    if (!gridEl) {
+        console.log("❌ Không tìm thấy genre-grid element");
+        return;
+    }
     
     gridEl.innerHTML = "";
     
     var entries = [];
+    var totalMovies = 0;
+    var matchedMovies = 0;
+    
     Object.keys(movieIndex).forEach(function(id) {
         var data = movieIndex[id];
+        totalMovies++;
+        
+        // Debug: log genre của từng phim
+        if (data.genre) {
+            console.log("Phim:", data.displayName || id, "Genre:", data.genre);
+        }
+        
         // Kiểm tra thể loại khớp
         if (data.genre && data.genre.trim() === genre) {
+            matchedMovies++;
             // Lấy uploadDate mới nhất từ episodes
             var latestUploadDate = null;
             if (data.episodes && data.episodes.length > 0) {
@@ -1094,6 +1112,9 @@ function renderGenreMovies(genre) {
         }
     });
     
+    // Debug log
+    console.log("🎬 Render genre:", genre, "Tổng phim:", totalMovies, "Khớp:", matchedMovies, "Entries:", entries.length);
+    
     // Sắp xếp theo uploadDate mới nhất (giảm dần)
     entries.sort(function(a, b) {
         return b.uploadDate.localeCompare(a.uploadDate);
@@ -1101,6 +1122,9 @@ function renderGenreMovies(genre) {
     
     if (!entries.length) {
         gridEl.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">Chưa có phim thể loại "' + genre + '"</div>';
+        // Vẫn hiển thị section để user biết
+        var section = document.getElementById('genre-section');
+        if (section) section.style.display = "block";
         return;
     }
     
