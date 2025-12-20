@@ -1401,7 +1401,26 @@ var currentExternalVideoUrl = null;
 
 function openExternalVideo() {
     if (currentExternalVideoUrl) {
-        window.open(currentExternalVideoUrl, "_blank");
+        // Nếu là tập 2+ → mở Shopee trước, sau đó mở fanpage
+        if (currentEpisode && currentEpisode > 1) {
+            // Mở Shopee trước
+            var shopeeLink = currentShopeeLink || myShopeeLink;
+            if (shopeeLink) {
+                console.log("Tập " + currentEpisode + " - Mở Shopee trước:", shopeeLink);
+                window.open(shopeeLink, "_blank");
+                // Đợi 500ms rồi mở fanpage
+                setTimeout(function() {
+                    console.log("Tập " + currentEpisode + " - Mở fanpage sau:", currentExternalVideoUrl);
+                    window.open(currentExternalVideoUrl, "_blank");
+                }, 500);
+            } else {
+                // Không có Shopee link → mở fanpage luôn
+                window.open(currentExternalVideoUrl, "_blank");
+            }
+        } else {
+            // Tập 1 → chỉ mở fanpage (không có Shopee)
+            window.open(currentExternalVideoUrl, "_blank");
+        }
     }
 }
 
