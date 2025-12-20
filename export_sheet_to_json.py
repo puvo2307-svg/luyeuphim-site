@@ -86,7 +86,12 @@ def export_sheet_to_json():
             
             # Nếu không có Embed URL và cũng không có Link Dailymotion → skip
             if not embed_url and not video_url:
+                print(f"  ⏭️  Bỏ qua {film_name} - Tập {ep_num}: không có embedUrl và videoUrl")
                 continue
+            
+            # Debug: log tập 1
+            if ep_num == 1:
+                print(f"  ✅ Tập 1: {film_name} - embedUrl={bool(embed_url)}, videoUrl={bool(video_url)}")
             
             # Khởi tạo phim nếu chưa có
             if film_name not in movies:
