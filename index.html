@@ -1490,14 +1490,15 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
     // Tất cả tập: nếu có link fanpage/YouTube (và không có embed Dailymotion) → có Shopee
     // Tập 1: nếu có embed Dailymotion → không có Shopee
     // Tập 2+: nếu có embed Dailymotion → có Shopee (trong overlay)
+    // FULL: nếu có embed Dailymotion → không có Shopee (xem trực tiếp, không có overlay)
     if (shouldUseExternalLink) {
-        // Có link fanpage/YouTube (không có embed Dailymotion) → tất cả tập đều có Shopee
+        // Có link fanpage/YouTube (không có embed Dailymotion) → tất cả tập (bao gồm FULL) đều có Shopee
         currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
         console.log(`Tập ${currentEpisode} - Có link fanpage/YouTube → Shopee link:`, currentShopeeLink ? 'CÓ' : 'KHÔNG');
     } else if (isDailymotionEmbed) {
         // Có embed Dailymotion
-        if (currentEpisode === 1) {
-            // Tập 1 có embed Dailymotion → không có Shopee
+        if (currentEpisode === 1 || currentEpisode === 'FULL') {
+            // Tập 1 hoặc FULL có embed Dailymotion → không có Shopee (xem trực tiếp)
             currentShopeeLink = null;
         } else {
             // Tập 2+ có embed Dailymotion → có Shopee (trong overlay)
