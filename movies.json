@@ -117,26 +117,40 @@
       ]
     },
     {
-      "name": "Trở_Lại_Đường_Đua_(56)",
-      "vietName": "Trở_Lại_Đường_Đua_(56)",
+      "name": "Bố_Tôi_Là_Trùm_Ẩn_Danh",
+      "vietName": "Bố Tôi Là Ông Trùm Ẩn Danh",
       "summary": "",
-      "top": "",
-      "poster": "",
-      "year": "",
+      "top": 5,
+      "poster": "https://cdn.phimngan.xyz/covers/52e96d54-1318-4d4b-ac83-5954af623276.jpg",
+      "year": 2025,
       "genre": "",
       "country": "",
       "allowPC": false,
       "episodes": [
         {
-          "ep": 3,
-          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2u3a",
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2u3y",
           "videoUrl": "",
           "uploadDate": "2025-12-20",
           "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2u3w",
+          "videoUrl": "",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w2u3u",
+          "videoUrl": "",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T07:58:49.362952"
+  "updated": "2025-12-20T08:25:03.484319"
 }
