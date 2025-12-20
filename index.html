@@ -780,6 +780,7 @@ function loadMoviesFromJSON() {
 // Fallback: Load từ Sheet trực tiếp (nếu JSON chưa có)
 function loadMoviesFromSheetFallback() {
     var SHEET_JSON_URL = "https://docs.google.com/spreadsheets/d/1KxEhDNIH7AdgSBSL05s4jQnPghLOo2MI8wvgBxTXv7w/gviz/tq?tqx=out:json&sheet=Sheet4";
+    console.log("📥 Đang load từ Sheet fallback:", SHEET_JSON_URL);
     fetch(SHEET_JSON_URL)
         .then(function(res) { return res.text(); })
         .then(function(text) {
