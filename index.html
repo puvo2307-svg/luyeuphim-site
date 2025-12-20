@@ -754,6 +754,7 @@ function loadMoviesFromJSON() {
             });
 
             renderTopMovies();
+            initGenreTabs(); // Khởi tạo tabs và render phim theo thể loại
             if (banners.length > 0) {
                 renderBanners();
             }
