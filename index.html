@@ -1436,6 +1436,8 @@ function openExternalVideo() {
             console.log("Tập " + currentEpisode + " - Không có Shopee link, mở link luôn:", currentExternalVideoUrl);
             window.open(currentExternalVideoUrl, "_blank");
         }
+    } else {
+        console.log("Tập " + currentEpisode + " - Không có currentExternalVideoUrl, không mở gì");
     }
 }
 
@@ -1519,13 +1521,27 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
                 console.log(`Tập ${currentEpisode} - Nút play đã hiển thị`);
             }
             if (label) {
-                // Tập 1: "Xem trên Fanpage", Tập 2+ và FULL: "Mở Shopee & Xem trên Fanpage"
+                // Tập 1: "Xem trên Fanpage/YouTube", Tập 2+ và FULL: "Mở Shopee & Xem"
                 if (currentEpisode === 1) {
-                    label.textContent = 'Xem trên Fanpage';
+                    // Xác định loại link để hiển thị label phù hợp
+                    if (videoUrlStr.includes('facebook.com') || videoUrlStr.includes('fb.com')) {
+                        label.textContent = 'Xem trên Fanpage';
+                    } else if (videoUrlStr.includes('youtube.com') || videoUrlStr.includes('youtu.be')) {
+                        label.textContent = 'Xem trên YouTube';
+                    } else {
+                        label.textContent = 'Xem video';
+                    }
                 } else if (currentEpisode === 'FULL') {
                     label.textContent = '🛒 Mở Shopee & Xem FULL';
                 } else {
-                    label.textContent = '🛒 Mở Shopee & Xem trên Fanpage';
+                    // Tập 2+: Xác định loại link
+                    if (videoUrlStr.includes('facebook.com') || videoUrlStr.includes('fb.com')) {
+                        label.textContent = '🛒 Mở Shopee & Xem trên Fanpage';
+                    } else if (videoUrlStr.includes('youtube.com') || videoUrlStr.includes('youtu.be')) {
+                        label.textContent = '🛒 Mở Shopee & Xem trên YouTube';
+                    } else {
+                        label.textContent = '🛒 Mở Shopee & Xem video';
+                    }
                 }
                 label.style.display = 'block';
                 label.style.visibility = 'visible';
