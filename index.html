@@ -1420,8 +1420,9 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
     }
 
     // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → hiển thị placeholder
-    if (currentEpisode === 1 && videoUrl && String(videoUrl).trim().startsWith("http")) {
-        currentExternalVideoUrl = String(videoUrl).trim();
+    var videoUrlStr = videoUrl ? String(videoUrl).trim() : '';
+    if (currentEpisode === 1 && videoUrlStr && videoUrlStr.startsWith("http")) {
+        currentExternalVideoUrl = videoUrlStr;
         
         // Ẩn iframe, hiện placeholder
         if (player) player.style.display = 'none';
@@ -1429,7 +1430,13 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
             placeholder.classList.add('active');
             // Lấy poster từ movieIndex nếu có
             if (movieId && movieIndex[movieId] && movieIndex[movieId].poster) {
-                placeholderThumb.src = movieIndex[movieId].poster;
+                var posterUrl = movieIndex[movieId].poster.trim();
+                if (posterUrl) {
+                    placeholderThumb.src = posterUrl;
+                    placeholderThumb.style.display = 'block';
+                } else {
+                    placeholderThumb.style.display = 'none';
+                }
             } else {
                 placeholderThumb.style.display = 'none';
             }
