@@ -65,6 +65,61 @@
         }
         iframe { width: 100%; height: 100%; border: none; }
         
+        /* === EXTERNAL VIDEO PLACEHOLDER (Tập 1 với Fanpage link) === */
+        #external-video-placeholder {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        #external-video-placeholder.active {
+            display: flex;
+        }
+        #external-video-thumbnail {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0.7;
+        }
+        #external-video-play-btn {
+            position: relative;
+            z-index: 10;
+            width: 80px;
+            height: 80px;
+            background: rgba(238, 77, 45, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            transition: transform 0.2s;
+        }
+        #external-video-play-btn:active {
+            transform: scale(0.95);
+        }
+        #external-video-label {
+            position: relative;
+            z-index: 10;
+            margin-top: 20px;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            padding: 0 20px;
+        }
+        
         /* === OVERLAY SHOPEE === */
         #overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -420,6 +475,12 @@
                 <p class="text-support">Ủng hộ chi phí duy trì và vận hành kênh Lu Yêu Phim</p>
                 <button class="btn-shopee-main">🛒 MỞ SHOPEE & QUAY LẠI XEM FULL</button>
                 <p class="text-note">(Xin lỗi nếu overlay xuất hiện nhiều; đây là một phần chi phí duy trì kênh. App Shopee sẽ mở ở tab mới, bạn có thể quay lại đây sau khi hoàn tất.)</p>
+            </div>
+            <!-- Placeholder cho video ngoài (Tập 1 với Fanpage link) -->
+            <div id="external-video-placeholder" onclick="openExternalVideo()">
+                <img id="external-video-thumbnail" src="" alt="Video thumbnail" onerror="this.style.display='none'">
+                <div id="external-video-play-btn">▶</div>
+                <div id="external-video-label">Xem trên Fanpage</div>
             </div>
             <!-- autoplay mặc định =1, tắt overlay để người dùng chủ động Play nếu muốn -->
             <iframe id="video-player" src="" allow="fullscreen" allowfullscreen></iframe>
@@ -1329,8 +1390,20 @@ function hideDonateInfo(evt) {
     if (backdrop) backdrop.style.display = 'none';
 }
 
+var currentExternalVideoUrl = null;
+
+function openExternalVideo() {
+    if (currentExternalVideoUrl) {
+        window.open(currentExternalVideoUrl, "_blank");
+    }
+}
+
 function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shopeeLink, videoUrl) {
     var overlay = document.getElementById('overlay');
+    var player = document.getElementById('video-player');
+    var placeholder = document.getElementById('external-video-placeholder');
+    var placeholderThumb = document.getElementById('external-video-thumbnail');
+    
     currentEpisode = Number(epNum);
     
     // Set link Shopee cho tập này
@@ -1346,18 +1419,34 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         overlay.style.display = (currentEpisode === 1) ? 'none' : 'flex';
     }
 
-    // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → mở tab mới
+    // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → hiển thị placeholder
     if (currentEpisode === 1 && videoUrl && String(videoUrl).trim().startsWith("http")) {
-        window.open(String(videoUrl).trim(), "_blank");
-        // Không đổi player, chỉ redirect người dùng
-    } else {
-        var player = document.getElementById('video-player');
-        var src = String(source || "");
-        if (!src.startsWith("http")) {
-            // Bật autoplay (mute=1 để tương thích mobile)
-            src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
+        currentExternalVideoUrl = String(videoUrl).trim();
+        
+        // Ẩn iframe, hiện placeholder
+        if (player) player.style.display = 'none';
+        if (placeholder) {
+            placeholder.classList.add('active');
+            // Lấy poster từ movieIndex nếu có
+            if (movieId && movieIndex[movieId] && movieIndex[movieId].poster) {
+                placeholderThumb.src = movieIndex[movieId].poster;
+            } else {
+                placeholderThumb.style.display = 'none';
+            }
         }
-        player.src = src;
+    } else {
+        // Tập 2+ hoặc không có videoUrl ngoài → dùng Dailymotion player
+        currentExternalVideoUrl = null;
+        if (placeholder) placeholder.classList.remove('active');
+        if (player) {
+            player.style.display = 'block';
+            var src = String(source || "");
+            if (!src.startsWith("http")) {
+                // Bật autoplay (mute=1 để tương thích mobile)
+                src = "https://geo.dailymotion.com/player.html?video=" + src + "&autoplay=1&mute=1";
+            }
+            player.src = src;
+        }
     }
 
     var displayTitle = "Tập " + epNum;
