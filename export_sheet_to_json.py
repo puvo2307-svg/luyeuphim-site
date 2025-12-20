@@ -38,6 +38,8 @@ def export_sheet_to_json():
         movies = {}
         banners = []
         
+        print(f"📊 Tổng số rows trong Sheet: {len(rows)}")
+        ep1_count = 0
         for row in rows:
             film_name = row.get('Tên Bộ Phim', '').strip()
             if not film_name:
@@ -91,7 +93,8 @@ def export_sheet_to_json():
             
             # Debug: log tập 1
             if ep_num == 1:
-                print(f"  ✅ Tập 1: {film_name} - embedUrl={bool(embed_url)}, videoUrl={bool(video_url)}")
+                ep1_count += 1
+                print(f"  ✅ Tập 1 #{ep1_count}: {film_name} - embedUrl='{embed_url[:50] if embed_url else ''}', videoUrl='{video_url[:50] if video_url else ''}'")
             
             # Khởi tạo phim nếu chưa có
             if film_name not in movies:
