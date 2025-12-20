@@ -533,6 +533,8 @@ class DailymotionHelperGUI:
                     # Pattern match cả 2 format: final-*-part* và final-*-part*-daily.mp4
                     m = _re.search(r"^final-(.+?)-part(\d+)(?:-daily)?(?:\.mp4)?$", title, _re.IGNORECASE)
                     if not m:
+                        # Log video không match pattern để debug
+                        self._log(f"  ⏭️  Bỏ qua video {vid}: không match pattern (title: {title[:50]}...)")
                         continue
 
                     film_name = m.group(1).strip()
@@ -554,6 +556,7 @@ class DailymotionHelperGUI:
 
                     # Bỏ qua nếu video đã tồn tại trong sheet
                     if video_url and video_url.strip() in existing_urls:
+                        self._log(f"  ⏭️  Bỏ qua video {vid}: đã có trong Sheet")
                         continue
 
                     # Format ngày
