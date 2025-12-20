@@ -12,6 +12,13 @@
       "allowPC": false,
       "episodes": [
         {
+          "ep": 1,
+          "embedUrl": "https://www.facebook.com/reel/903462675696714/",
+          "videoUrl": "",
+          "uploadDate": "2025-12-19",
+          "shopeeLink": null
+        },
+        {
           "ep": 2,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0f8g",
           "videoUrl": "",
@@ -38,6 +45,13 @@
       "country": "",
       "allowPC": false,
       "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "https://www.facebook.com/reel/13609480783808255",
+          "videoUrl": "",
+          "uploadDate": "2025-12-19",
+          "shopeeLink": null
+        },
         {
           "ep": 2,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0lh2",
@@ -83,5 +97,5 @@
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T04:15:00.153966"
+  "updated": "2025-12-20T04:22:28.103394"
 }
