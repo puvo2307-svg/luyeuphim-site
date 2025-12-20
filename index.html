@@ -453,10 +453,7 @@
     <!-- PHIM THEO THỂ LOẠI -->
     <div id="genre-section" class="genre-section" style="display:none;">
         <div class="top-title">🎬 Phim theo thể loại</div>
-        <div class="genre-tabs">
-            <button class="genre-tab active" data-genre="Cổ Trang" onclick="switchGenreTab('Cổ Trang')">Cổ Trang</button>
-            <button class="genre-tab" data-genre="Hiện Đại" onclick="switchGenreTab('Hiện Đại')">Hiện Đại</button>
-        </div>
+        <div id="genre-tabs" class="genre-tabs"></div>
         <div id="genre-grid" class="top-grid"></div>
     </div>
 
@@ -935,7 +932,7 @@ function loadMoviesFromSheetFallback() {
             });
 
             renderTopMovies();
-            renderGenreMovies(currentGenreTab);
+            initGenreTabs(); // Khởi tạo tabs và render phim theo thể loại
             if (banners.length > 0) {
                 renderBanners();
             }
@@ -1046,7 +1043,49 @@ function renderTopMovies() {
 }
 
 // ========== PHIM THEO THỂ LOẠI ==========
-var currentGenreTab = 'Cổ Trang';
+var currentGenreTab = null;
+var availableGenres = [];
+
+function initGenreTabs() {
+    // Thu thập tất cả thể loại từ movieIndex
+    var genreSet = new Set();
+    Object.keys(movieIndex).forEach(function(id) {
+        var data = movieIndex[id];
+        if (data.genre && data.genre.trim()) {
+            genreSet.add(data.genre.trim());
+        }
+    });
+    
+    availableGenres = Array.from(genreSet).sort();
+    
+    var tabsContainer = document.getElementById('genre-tabs');
+    if (!tabsContainer) return;
+    
+    tabsContainer.innerHTML = "";
+    
+    if (availableGenres.length === 0) {
+        // Không có thể loại nào → ẩn section
+        var section = document.getElementById('genre-section');
+        if (section) section.style.display = "none";
+        return;
+    }
+    
+    // Tạo tabs động
+    availableGenres.forEach(function(genre, index) {
+        var tab = document.createElement('button');
+        tab.className = 'genre-tab' + (index === 0 ? ' active' : '');
+        tab.setAttribute('data-genre', genre);
+        tab.textContent = genre;
+        tab.onclick = function() { switchGenreTab(genre); };
+        tabsContainer.appendChild(tab);
+    });
+    
+    // Set tab đầu tiên làm active
+    if (availableGenres.length > 0) {
+        currentGenreTab = availableGenres[0];
+        renderGenreMovies(currentGenreTab);
+    }
+}
 
 function switchGenreTab(genre) {
     currentGenreTab = genre;
