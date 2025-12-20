@@ -238,20 +238,28 @@ def export_sheet_to_json():
                 
                 # Đặc biệt cho tập 1: ưu tiên episode có videoUrl (link fanpage)
                 if ep_num == 1:
-                    if video_url and not existing_ep.get('videoUrl'):
-                        # Tập 1 mới có videoUrl → thay thế
-                        print(f"  🔄 Thay thế tập 1: {film_name} (có videoUrl mới)")
+                    existing_has_video = bool(existing_ep.get('videoUrl'))
+                    current_has_video = bool(video_url)
+                    existing_has_embed = bool(existing_ep.get('embedUrl'))
+                    current_has_embed = bool(embed_url)
+                    
+                    # Ưu tiên: videoUrl > embedUrl (vì tập 1 thường dùng link fanpage)
+                    if current_has_video and not existing_has_video:
+                        # Tập 1 mới có videoUrl → thay thế hoàn toàn
+                        print(f"  🔄 Thay thế tập 1: {film_name} (có videoUrl mới: {video_url[:50]}...)")
                         movies[film_name]['episodes_dict'][ep_key] = current_episode_data
                         # Tìm và thay thế trong list
                         for i, ep in enumerate(movies[film_name]['episodes']):
                             if ep['ep'] == ep_num:
                                 movies[film_name]['episodes'][i] = current_episode_data
                                 break
-                    elif embed_url and not existing_ep.get('embedUrl'):
-                        # Tập 1 mới có embedUrl → merge vào existing
-                        existing_ep['embedUrl'] = embed_url
+                    elif existing_has_video and not current_has_video:
+                        # Existing có videoUrl, current không có → giữ existing, chỉ merge embedUrl nếu có
+                        if current_has_embed and not existing_has_embed:
+                            existing_ep['embedUrl'] = embed_url
+                            print(f"  ➕ Merge embedUrl vào tập 1: {film_name}")
                     else:
-                        # Merge các field còn thiếu
+                        # Cả 2 đều có hoặc đều không có videoUrl → merge tất cả field
                         if embed_url and not existing_ep.get('embedUrl'):
                             existing_ep['embedUrl'] = embed_url
                         if video_url and not existing_ep.get('videoUrl'):
