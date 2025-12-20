@@ -931,6 +931,7 @@ function loadMoviesFromSheetFallback() {
             });
 
             renderTopMovies();
+            renderGenreMovies(currentGenreTab);
             if (banners.length > 0) {
                 renderBanners();
             }
