@@ -1431,27 +1431,28 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
     var embedUrlStr = source ? String(source).trim() : '';
     
     // Nếu videoUrl rỗng nhưng embedUrl là link Facebook/reel → dùng embedUrl làm videoUrl
-    if (currentEpisode === 1 && !videoUrlStr && embedUrlStr) {
+    if (!videoUrlStr && embedUrlStr) {
         if (embedUrlStr.includes('facebook.com') || embedUrlStr.includes('fb.com') || embedUrlStr.includes('/reel/')) {
             videoUrlStr = embedUrlStr;
-            console.log("Tập 1 - Dùng embedUrl làm videoUrl (Facebook link):", videoUrlStr);
+            console.log(`Tập ${currentEpisode} - Dùng embedUrl làm videoUrl (Facebook link):`, videoUrlStr);
         }
     }
     
     // Debug log
-    if (currentEpisode === 1) {
-        console.log("Tập 1 - videoUrl:", videoUrlStr, "embedUrl:", embedUrlStr);
+    if (videoUrlStr && videoUrlStr.includes('facebook')) {
+        console.log(`Tập ${currentEpisode} - videoUrl:`, videoUrlStr, "embedUrl:", embedUrlStr);
     }
     
-    if (currentEpisode === 1 && videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
+    // Nếu có videoUrl ngoài (Facebook/Fanpage) → hiển thị placeholder (cho TẤT CẢ tập, không chỉ tập 1)
+    if (videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
         currentExternalVideoUrl = videoUrlStr;
-        console.log("Tập 1 có videoUrl ngoài → hiển thị placeholder:", videoUrlStr);
+        console.log(`Tập ${currentEpisode} có videoUrl ngoài → hiển thị placeholder:`, videoUrlStr);
         
         // Ẩn iframe, hiện placeholder
         if (player) player.style.display = 'none';
         if (placeholder) {
             placeholder.classList.add('active');
-            console.log("Tập 1 - Placeholder đã được kích hoạt");
+            console.log(`Tập ${currentEpisode} - Placeholder đã được kích hoạt`);
             
             // Đảm bảo nút play và label LUÔN hiển thị (dù có poster hay không)
             var playBtn = document.getElementById('external-video-play-btn');
@@ -1460,36 +1461,42 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
                 playBtn.style.display = 'flex';
                 playBtn.style.visibility = 'visible';
                 playBtn.style.opacity = '1';
-                console.log("Tập 1 - Nút play đã hiển thị");
+                console.log(`Tập ${currentEpisode} - Nút play đã hiển thị`);
             }
             if (label) {
+                // Tập 1: "Xem trên Fanpage", Tập 2+: "Mở Shopee & Xem trên Fanpage"
+                if (currentEpisode === 1) {
+                    label.textContent = 'Xem trên Fanpage';
+                } else {
+                    label.textContent = '🛒 Mở Shopee & Xem trên Fanpage';
+                }
                 label.style.display = 'block';
                 label.style.visibility = 'visible';
                 label.style.opacity = '1';
-                console.log("Tập 1 - Label đã hiển thị");
+                console.log(`Tập ${currentEpisode} - Label đã hiển thị`);
             }
             
             // Lấy poster từ movieIndex nếu có
             if (movieId && movieIndex[movieId] && movieIndex[movieId].poster) {
                 var posterUrl = movieIndex[movieId].poster.trim();
                 if (posterUrl) {
-                    console.log("Tập 1 - Set poster:", posterUrl);
+                    console.log(`Tập ${currentEpisode} - Set poster:`, posterUrl);
                     placeholderThumb.src = posterUrl;
                     placeholderThumb.style.display = 'block';
                     placeholderThumb.onerror = function() {
-                        console.log("Tập 1 - Poster load error, ẩn thumbnail");
+                        console.log(`Tập ${currentEpisode} - Poster load error, ẩn thumbnail`);
                         this.style.display = 'none';
                     };
                 } else {
-                    console.log("Tập 1 - Không có poster URL, ẩn thumbnail");
+                    console.log(`Tập ${currentEpisode} - Không có poster URL, ẩn thumbnail`);
                     placeholderThumb.style.display = 'none';
                 }
             } else {
-                console.log("Tập 1 - Không tìm thấy movieId hoặc poster trong movieIndex, ẩn thumbnail");
+                console.log(`Tập ${currentEpisode} - Không tìm thấy movieId hoặc poster trong movieIndex, ẩn thumbnail`);
                 placeholderThumb.style.display = 'none';
             }
         } else {
-            console.log("Tập 1 - LỖI: Không tìm thấy placeholder element!");
+            console.log(`Tập ${currentEpisode} - LỖI: Không tìm thấy placeholder element!`);
         }
     } else {
         // Tập 2+ hoặc không có videoUrl ngoài → dùng Dailymotion player
