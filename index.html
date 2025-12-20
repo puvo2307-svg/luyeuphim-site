@@ -700,7 +700,9 @@ function normalizeText(str) {
 }
 
 function loadMoviesFromJSON() {
-    fetch(MOVIES_JSON_URL)
+    // Thêm timestamp để tránh cache (mỗi lần load đều có timestamp mới)
+    var jsonUrl = "https://raw.githubusercontent.com/puvo2307-svg/luyeuphim-site/main/movies.json?t=" + Date.now();
+    fetch(jsonUrl, { cache: 'no-store' })
         .then(function(res) {
             if (!res.ok) {
                 throw new Error("Không thể load JSON: " + res.status);
