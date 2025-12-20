@@ -149,8 +149,28 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
+    },
+    {
+      "name": "Đệ Nhất Phá Gia - Phò Mã Báo Thù",
+      "vietName": "Đệ Nhất Phá Gia - Phò Mã Báo Thù",
+      "summary": "",
+      "top": 5,
+      "poster": "https://bbs.dyyjmax.org/assets/files/2025-11-28/1764357365-893267-56.jpg",
+      "year": 2025,
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": "FULL",
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/17jCwETF5H/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
+        }
+      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T08:34:38.581104"
+  "updated": "2025-12-20T08:39:30.471415"
 }
