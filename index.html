@@ -1171,9 +1171,14 @@ function renderGenreMovies(genre) {
         gridEl.appendChild(createGenreCard(item));
     });
     
-    // Hiển thị section
+    // Hiển thị section (luôn hiển thị, dù có phim hay không)
     var section = document.getElementById('genre-section');
-    if (section) section.style.display = "block";
+    if (section) {
+        section.style.display = "block";
+        console.log("✅ Hiển thị genre-section với", entries.length, "phim");
+    } else {
+        console.log("❌ Không tìm thấy genre-section element");
+    }
 }
 
 // ========== BANNER CAROUSEL ==========
