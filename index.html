@@ -1434,6 +1434,9 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
                 if (posterUrl) {
                     placeholderThumb.src = posterUrl;
                     placeholderThumb.style.display = 'block';
+                    placeholderThumb.onerror = function() {
+                        this.style.display = 'none';
+                    };
                 } else {
                     placeholderThumb.style.display = 'none';
                 }
