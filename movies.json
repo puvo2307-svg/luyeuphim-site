@@ -12,13 +12,6 @@
       "allowPC": false,
       "episodes": [
         {
-          "ep": 1,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/reel/903462675696714/",
-          "uploadDate": "2025-12-19",
-          "shopeeLink": null
-        },
-        {
           "ep": 2,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0f8g",
           "videoUrl": "",
@@ -46,13 +39,6 @@
       "allowPC": false,
       "episodes": [
         {
-          "ep": 1,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/reel/1360948078380825",
-          "uploadDate": "2025-12-19",
-          "shopeeLink": null
-        },
-        {
           "ep": 2,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w0lh2",
           "videoUrl": "",
@@ -67,56 +53,8 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
-    },
-    {
-      "name": "Võ Công Giả Dị Năng",
-      "vietName": "Võ Công Giả Dị Năng",
-      "summary": "Cuộc sống bình yên của Thạch Kiến Minh và Diệp Kiều bỗng chốc bị phá vỡ khi Phái Hàn Sơn do Phong Nhất Hàn cùng mẹ con ông ta tìm đến trả thù. Dị năng giả Cục Thần Ẩn đã nhân cơ hội này ra tay đàn áp võ giả, buộc Thạch Kiến Minh phải trở lại giang hồ. Một trận chiến sinh tử nổ ra hé lộ âm mưu chấn động, thay đổi vận mệnh võ lâm.",
-      "top": 3,
-      "poster": "https://bbs.dyyjmax.org/assets/files/2025-09-29/1759163435-393686-71.jpg",
-      "year": 2025,
-      "genre": "",
-      "country": "",
-      "allowPC": false,
-      "episodes": [
-        {
-          "ep": 1,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/share/v/1BXE4m9CTV/",
-          "uploadDate": "2025-12-20",
-          "shopeeLink": null
-        },
-        {
-          "ep": 2,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/share/v/14P5E4P5i74/",
-          "uploadDate": "2025-12-20",
-          "shopeeLink": null
-        },
-        {
-          "ep": 3,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/share/v/1BookFpYDN/",
-          "uploadDate": "2025-12-20",
-          "shopeeLink": null
-        },
-        {
-          "ep": 4,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/share/v/1EmJnPpX9f/",
-          "uploadDate": "2025-12-20",
-          "shopeeLink": null
-        },
-        {
-          "ep": 5,
-          "embedUrl": "",
-          "videoUrl": "https://www.facebook.com/share/v/17TcV77TyZ/",
-          "uploadDate": "2025-12-20",
-          "shopeeLink": null
-        }
-      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-20T05:02:11.279071"
+  "updated": "2025-12-20T05:10:19.677662"
 }
