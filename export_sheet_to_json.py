@@ -99,7 +99,7 @@ def export_sheet_to_json():
                 print(f"  ✅ Tập 1 #{ep1_count}: {film_name}")
                 print(f"      embedUrl: {embed_preview if embed_url else '(RỖNG)'}")
                 print(f"      videoUrl: {video_preview if video_url else '(RỖNG)'}")
-                print(f"      → Sẽ export: {'CÓ' if (embed_url or video_url) else 'KHÔNG')}")
+                print(f"      → Sẽ export: {'CÓ' if (embed_url or video_url) else 'KHÔNG'}")
             
             # Khởi tạo phim nếu chưa có
             if film_name not in movies:
