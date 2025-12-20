@@ -680,7 +680,8 @@ function updateMetaTags() {
 
 // ========== LOAD DỮ LIỆU TỪ JSON (Export từ Sheet) ==========
 // URL JSON file (sẽ được export tự động từ Sheet mỗi 10 phút)
-var MOVIES_JSON_URL = "https://raw.githubusercontent.com/puvo2307-svg/luyeuphim-site/main/movies.json";
+// Thêm timestamp để tránh cache
+var MOVIES_JSON_URL = "https://raw.githubusercontent.com/puvo2307-svg/luyeuphim-site/main/movies.json?t=" + Date.now();
 // Fallback nếu JSON lỗi thì load từ Sheet trực tiếp
 
 var movieIndex = {};
