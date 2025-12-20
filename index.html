@@ -842,7 +842,8 @@ function loadMoviesFromSheetFallback() {
                         poster: "", 
                         displayName: displayName, 
                         summary: "",  // Tóm tắt phim
-                        allowPC: false 
+                        allowPC: false,
+                        genre: ""  // Thể loại
                     };
                 }
                 movieIndex[filmA].displayName = displayName;
@@ -859,10 +860,14 @@ function loadMoviesFromSheetFallback() {
                     shopeeLink = null;
                 }
                 
+                // Ngày Upload (cột F, index 5)
+                var uploadDate = (cells[5] && cells[5].v) ? String(cells[5].v).trim() : "";
+                
                 movieIndex[filmA].episodes.push({ 
                     ep: ep, 
                     embedUrl: embedUrl,
-                    shopeeLink: shopeeLink || null
+                    shopeeLink: shopeeLink || null,
+                    uploadDate: uploadDate || ""
                 });
 
                 var allowPCValue = cells[13] && cells[13].v; // Cột N: Xem PC
@@ -876,6 +881,12 @@ function loadMoviesFromSheetFallback() {
                 }
                 if (poster && !movieIndex[filmA].poster) {
                     movieIndex[filmA].poster = poster;
+                }
+                
+                // Thể loại (cột L, index 11)
+                var genre = (cells[11] && cells[11].v) ? String(cells[11].v).trim() : "";
+                if (genre && !movieIndex[filmA].genre) {
+                    movieIndex[filmA].genre = genre;
                 }
 
                 // Collect banners - gắn với phim cụ thể
