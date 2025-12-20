@@ -1467,49 +1467,65 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         embedUrlStr.includes('dailymotion.com/player.html')
     );
     
+    // Nếu có cả embed Dailymotion VÀ link fanpage/YouTube → ưu tiên embed Dailymotion, bỏ qua link fanpage
+    // Chỉ dùng link fanpage/YouTube nếu KHÔNG có embed Dailymotion
+    var shouldUseExternalLink = false;
+    if (videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
+        if (!isDailymotionEmbed) {
+            // Không có embed Dailymotion → dùng link fanpage/YouTube
+            shouldUseExternalLink = true;
+        } else {
+            // Có embed Dailymotion → bỏ qua link fanpage/YouTube, ưu tiên embed
+            console.log(`Tập ${currentEpisode} - Có cả embed Dailymotion và link fanpage, ưu tiên embed Dailymotion`);
+            videoUrlStr = ''; // Bỏ qua link fanpage
+        }
+    }
+    
     // Debug log
     if (videoUrlStr && (videoUrlStr.includes('facebook') || videoUrlStr.includes('youtube'))) {
         console.log(`Tập ${currentEpisode} - videoUrl:`, videoUrlStr, "embedUrl:", embedUrlStr, "isDailymotionEmbed:", isDailymotionEmbed);
     }
     
     // Set link Shopee cho tập này
-    // Tập 1: chỉ có Shopee nếu KHÔNG có embed Dailymotion (tức là có link fanpage/YouTube)
-    // Tập 2+: luôn có Shopee (nếu có link riêng thì dùng, không thì dùng mặc định)
-    // FULL: luôn có Shopee
-    if (currentEpisode === 1) {
-        if (isDailymotionEmbed && (!videoUrlStr || videoUrlStr.length === 0)) {
+    // Tất cả tập: nếu có link fanpage/YouTube (và không có embed Dailymotion) → có Shopee
+    // Tập 1: nếu có embed Dailymotion → không có Shopee
+    // Tập 2+: nếu có embed Dailymotion → có Shopee (trong overlay)
+    if (shouldUseExternalLink) {
+        // Có link fanpage/YouTube (không có embed Dailymotion) → tất cả tập đều có Shopee
+        currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
+        console.log(`Tập ${currentEpisode} - Có link fanpage/YouTube → Shopee link:`, currentShopeeLink ? 'CÓ' : 'KHÔNG');
+    } else if (isDailymotionEmbed) {
+        // Có embed Dailymotion
+        if (currentEpisode === 1) {
             // Tập 1 có embed Dailymotion → không có Shopee
             currentShopeeLink = null;
-        } else if (videoUrlStr && videoUrlStr.length > 0) {
-            // Tập 1 có link fanpage/YouTube → có Shopee
-            currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
         } else {
-            // Tập 1 không có gì → không có Shopee
-            currentShopeeLink = null;
+            // Tập 2+ có embed Dailymotion → có Shopee (trong overlay)
+            currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
         }
-        console.log(`Tập 1 - Shopee link:`, currentShopeeLink ? 'CÓ' : 'KHÔNG', "(isDailymotionEmbed:", isDailymotionEmbed, ", videoUrl:", videoUrlStr ? 'CÓ' : 'KHÔNG', ")");
+        console.log(`Tập ${currentEpisode} - Có embed Dailymotion → Shopee link:`, currentShopeeLink ? 'CÓ' : 'KHÔNG');
     } else {
-        // Từ tập 2 trở đi và FULL: dùng link riêng hoặc mặc định
-        currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
+        // Không có gì
+        currentShopeeLink = null;
     }
     
     // Logic hiển thị overlay Shopee:
-    // - Chỉ hiển thị khi: Tập 2+ (không phải tập 1) VÀ có embedUrl Dailymotion chuẩn VÀ không có videoUrl ngoài
+    // - Chỉ hiển thị khi: Tập 2+ (không phải tập 1) VÀ có embedUrl Dailymotion chuẩn VÀ không có link fanpage/YouTube
     // - Tập 1: KHÔNG có overlay Shopee (dù có embed hay không)
     if (overlay) {
         var shouldShowOverlay = false;
         if (currentEpisode !== 1 && currentEpisode !== 'FULL') {
-            // Tập 2+ và có embedUrl Dailymotion chuẩn và không có videoUrl ngoài
-            if (isDailymotionEmbed && (!videoUrlStr || videoUrlStr.length === 0)) {
+            // Tập 2+ và có embedUrl Dailymotion chuẩn và không có link fanpage/YouTube
+            if (isDailymotionEmbed && !shouldUseExternalLink) {
                 shouldShowOverlay = true;
             }
         }
         overlay.style.display = shouldShowOverlay ? 'flex' : 'none';
-        console.log(`Tập ${currentEpisode} - Overlay Shopee:`, shouldShowOverlay ? 'HIỂN THỊ' : 'ẨN', "(isDailymotionEmbed:", isDailymotionEmbed, ", videoUrl:", videoUrlStr ? 'CÓ' : 'KHÔNG', ")");
+        console.log(`Tập ${currentEpisode} - Overlay Shopee:`, shouldShowOverlay ? 'HIỂN THỊ' : 'ẨN', "(isDailymotionEmbed:", isDailymotionEmbed, ", shouldUseExternalLink:", shouldUseExternalLink, ")");
     }
     
-    // Nếu có videoUrl ngoài (Facebook/Fanpage/YouTube) → hiển thị placeholder (cho TẤT CẢ tập)
-    if (videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
+    // Nếu có link fanpage/YouTube (và không có embed Dailymotion) → hiển thị placeholder (cho TẤT CẢ tập)
+    if (shouldUseExternalLink && videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
         currentExternalVideoUrl = videoUrlStr;
         console.log(`Tập ${currentEpisode} có videoUrl ngoài → hiển thị placeholder:`, videoUrlStr);
         
