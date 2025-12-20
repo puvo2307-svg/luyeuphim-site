@@ -1428,9 +1428,19 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
 
     // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → hiển thị placeholder
     var videoUrlStr = videoUrl ? String(videoUrl).trim() : '';
+    var embedUrlStr = source ? String(source).trim() : '';
+    
+    // Nếu videoUrl rỗng nhưng embedUrl là link Facebook/reel → dùng embedUrl làm videoUrl
+    if (currentEpisode === 1 && !videoUrlStr && embedUrlStr) {
+        if (embedUrlStr.includes('facebook.com') || embedUrlStr.includes('fb.com') || embedUrlStr.includes('/reel/')) {
+            videoUrlStr = embedUrlStr;
+            console.log("Tập 1 - Dùng embedUrl làm videoUrl (Facebook link):", videoUrlStr);
+        }
+    }
+    
     // Debug log
     if (currentEpisode === 1) {
-        console.log("Tập 1 - videoUrl:", videoUrlStr, "embedUrl:", source);
+        console.log("Tập 1 - videoUrl:", videoUrlStr, "embedUrl:", embedUrlStr);
     }
     
     if (currentEpisode === 1 && videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
