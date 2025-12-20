@@ -1059,16 +1059,23 @@ function initGenreTabs() {
     availableGenres = Array.from(genreSet).sort();
     
     var tabsContainer = document.getElementById('genre-tabs');
-    if (!tabsContainer) return;
+    var section = document.getElementById('genre-section');
+    
+    if (!tabsContainer || !section) {
+        console.log("❌ Không tìm thấy genre-tabs hoặc genre-section");
+        return;
+    }
     
     tabsContainer.innerHTML = "";
     
     if (availableGenres.length === 0) {
         // Không có thể loại nào → ẩn section
-        var section = document.getElementById('genre-section');
-        if (section) section.style.display = "none";
+        section.style.display = "none";
+        console.log("⚠️ Không có thể loại nào trong dữ liệu");
         return;
     }
+    
+    console.log("✅ Tìm thấy", availableGenres.length, "thể loại:", availableGenres.join(", "));
     
     // Tạo tabs động
     availableGenres.forEach(function(genre, index) {
@@ -1080,9 +1087,10 @@ function initGenreTabs() {
         tabsContainer.appendChild(tab);
     });
     
-    // Set tab đầu tiên làm active
+    // Set tab đầu tiên làm active và render
     if (availableGenres.length > 0) {
         currentGenreTab = availableGenres[0];
+        section.style.display = "block"; // Luôn hiển thị section nếu có thể loại
         renderGenreMovies(currentGenreTab);
     }
 }
