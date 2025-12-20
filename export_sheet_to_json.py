@@ -330,8 +330,9 @@ def export_sheet_to_json():
             if 'episodes_dict' in film:
                 del film['episodes_dict']
             
-            # Sort theo số tập
-            film['episodes'].sort(key=lambda x: x['ep'])
+            # Sort theo số tập (FULL sẽ ở cuối)
+            # Xử lý: int < "FULL" (FULL luôn ở cuối)
+            film['episodes'].sort(key=lambda x: (x['ep'] == 'FULL', x['ep'] if isinstance(x['ep'], int) else 999))
             
             # Debug: kiểm tra tập 1 sau khi sort
             ep1_list = [ep for ep in film['episodes'] if ep.get('ep') == 1]
@@ -344,10 +345,17 @@ def export_sheet_to_json():
             # Kế thừa shopeeLink: nếu tập không có link riêng thì dùng link của tập trước
             last_shopee_link = None
             for ep in film['episodes']:
-                if ep['ep'] == 1:
+                ep_num = ep.get('ep')
+                if ep_num == 1:
                     # Tập 1 luôn không có Shopee
                     ep['shopeeLink'] = None
                     last_shopee_link = None
+                elif ep_num == 'FULL':
+                    # FULL: nếu không có Shopee link riêng → kế thừa từ tập trước
+                    if not ep.get('shopeeLink') and last_shopee_link:
+                        ep['shopeeLink'] = last_shopee_link
+                    elif ep.get('shopeeLink'):
+                        last_shopee_link = ep['shopeeLink']
                 else:
                     # Từ tập 2 trở đi
                     if ep['shopeeLink']:

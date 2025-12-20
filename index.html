@@ -1460,9 +1460,9 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         currentShopeeLink = (shopeeLink && shopeeLink.trim() && shopeeLink.trim() !== 'null') ? shopeeLink.trim() : myShopeeLink;
     }
     
-    // Tập 1: KHÔNG hiện Shopee overlay
+    // Tập 1 và FULL: KHÔNG hiện Shopee overlay (vì sẽ mở Shopee trong openExternalVideo)
     if (overlay) {
-        overlay.style.display = (currentEpisode === 1) ? 'none' : 'flex';
+        overlay.style.display = (currentEpisode === 1 || currentEpisode === 'FULL') ? 'none' : 'flex';
     }
 
     // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → hiển thị placeholder
@@ -1552,7 +1552,13 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         }
     }
 
-    var displayTitle = "Tập " + epNum;
+    // Hiển thị title: "FULL" hoặc "Tập X"
+    var displayTitle;
+    if (epNum === 'FULL' || epNum === 'full' || String(epNum).toUpperCase() === 'FULL') {
+        displayTitle = "FULL";
+    } else {
+        displayTitle = "Tập " + epNum;
+    }
     var filmName = filmNameOverride || "Tên Phim";
     document.getElementById('film-title').innerText = displayTitle + " - " + filmName;
 
