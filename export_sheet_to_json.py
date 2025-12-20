@@ -156,14 +156,19 @@ def export_sheet_to_json():
                         if current_top_int is None or new_top < current_top_int:
                             movies[film_name]['top'] = new_top
             # Poster (cột J) - chấp nhận mọi header chứa chữ \"Poster\"
+            # Lấy poster từ BẤT KỲ hàng nào có poster (không chỉ hàng đầu tiên)
             poster_raw = ''
             for k, v in row.items():
                 if k and 'Poster' in str(k):
                     poster_raw = (v or '').strip()
                     if poster_raw:
                         break
-            if poster_raw and not movies[film_name]['poster']:
-                movies[film_name]['poster'] = poster_raw
+            # Update poster nếu có (ưu tiên poster mới nếu chưa có, hoặc nếu poster hiện tại rỗng)
+            if poster_raw:
+                if not movies[film_name]['poster'] or movies[film_name]['poster'].strip() == '':
+                    movies[film_name]['poster'] = poster_raw
+                    if ep_num == 1:
+                        print(f"      📷 Poster: {poster_raw[:60]}...")
             if row.get('Năm', ''):
                 movies[film_name]['year'] = row.get('Năm', '')
             if row.get('Thể loại', '').strip():
