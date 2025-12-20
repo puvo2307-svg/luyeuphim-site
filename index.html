@@ -1424,8 +1424,14 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
 
     // Nếu là Tập 1 và có videoUrl ngoài (vd: link Fanpage/Facebook) → hiển thị placeholder
     var videoUrlStr = videoUrl ? String(videoUrl).trim() : '';
-    if (currentEpisode === 1 && videoUrlStr && videoUrlStr.startsWith("http")) {
+    // Debug log
+    if (currentEpisode === 1) {
+        console.log("Tập 1 - videoUrl:", videoUrlStr, "embedUrl:", source);
+    }
+    
+    if (currentEpisode === 1 && videoUrlStr && videoUrlStr.length > 0 && videoUrlStr.startsWith("http")) {
         currentExternalVideoUrl = videoUrlStr;
+        console.log("Tập 1 có videoUrl ngoài → hiển thị placeholder:", videoUrlStr);
         
         // Ẩn iframe, hiện placeholder
         if (player) player.style.display = 'none';
@@ -1435,17 +1441,23 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
             if (movieId && movieIndex[movieId] && movieIndex[movieId].poster) {
                 var posterUrl = movieIndex[movieId].poster.trim();
                 if (posterUrl) {
+                    console.log("Tập 1 - Set poster:", posterUrl);
                     placeholderThumb.src = posterUrl;
                     placeholderThumb.style.display = 'block';
                     placeholderThumb.onerror = function() {
+                        console.log("Tập 1 - Poster load error");
                         this.style.display = 'none';
                     };
                 } else {
+                    console.log("Tập 1 - Không có poster URL");
                     placeholderThumb.style.display = 'none';
                 }
             } else {
+                console.log("Tập 1 - Không tìm thấy movieId hoặc poster trong movieIndex");
                 placeholderThumb.style.display = 'none';
             }
+        } else {
+            console.log("Tập 1 - Không tìm thấy placeholder element");
         }
     } else {
         // Tập 2+ hoặc không có videoUrl ngoài → dùng Dailymotion player
