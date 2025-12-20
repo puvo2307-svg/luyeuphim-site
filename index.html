@@ -743,9 +743,14 @@ function loadMoviesFromJSON() {
                     summary: movie.summary || "",  // Tóm tắt phim
                     allowPC: movie.allowPC === true || movie.allowPC === 1,
                     year: movie.year || "",
-                    genre: movie.genre || "",
+                    genre: (movie.genre && movie.genre.trim()) ? movie.genre.trim() : "",
                     country: movie.country || ""
                 };
+                
+                // Debug: log genre khi load từ JSON
+                if (movieIndex[filmId].genre) {
+                    console.log("📝 Load từ JSON - Phim:", filmId, "Genre:", movieIndex[filmId].genre);
+                }
 
                 // Sort episodes
                 movieIndex[filmId].episodes.sort(function(a, b) {
