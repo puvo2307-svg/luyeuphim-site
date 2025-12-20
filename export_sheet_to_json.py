@@ -86,6 +86,19 @@ def export_sheet_to_json():
             embed_url = str(embed_url_raw).strip() if embed_url_raw else ''
             video_url = str(video_url_raw).strip() if video_url_raw else ''
             
+            # QUAN TRỌNG: Nếu Link Dailymotion là link Facebook/reel → đặt vào videoUrl
+            # Nếu Embed URL là link Facebook/reel → cũng đặt vào videoUrl
+            if video_url and ('facebook.com' in video_url.lower() or 'fb.com' in video_url.lower() or '/reel/' in video_url.lower()):
+                # Link Dailymotion là Facebook → dùng làm videoUrl, embedUrl để rỗng
+                if not embed_url or embed_url == video_url:
+                    embed_url = ''  # Không có embed URL cho Facebook link
+            elif embed_url and ('facebook.com' in embed_url.lower() or 'fb.com' in embed_url.lower() or '/reel/' in embed_url.lower()):
+                # Embed URL là Facebook → chuyển sang videoUrl
+                video_url = embed_url
+                embed_url = ''  # Không có embed URL cho Facebook link
+                if ep_num == 1:
+                    print(f"      🔄 Chuyển embedUrl (Facebook) sang videoUrl: {video_url[:60]}...")
+            
             # Nếu không có Embed URL và cũng không có Link Dailymotion → skip
             if not embed_url and not video_url:
                 print(f"  ⏭️  Bỏ qua {film_name} - Tập {ep_num}: không có embedUrl và videoUrl")
