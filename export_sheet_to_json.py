@@ -66,7 +66,10 @@ def export_sheet_to_json():
                 continue
             
             embed_url = row.get('Embed URL', '').strip()
-            if not embed_url:
+            video_url = row.get('Link Dailymotion', '').strip()
+            
+            # Nếu không có Embed URL và cũng không có Link Dailymotion → skip
+            if not embed_url and not video_url:
                 continue
             
             # Khởi tạo phim nếu chưa có
