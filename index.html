@@ -175,35 +175,42 @@
         .search-result-item:last-child { border-bottom: none; }
         .search-result-item:hover { background: #262626; }
 
-        /* === TOP PHIM (CUỘN NGANG) === */
+        /* === TOP PHIM (GRID LAYOUT - CUỘN DỌC) === */
         .top-section { margin-top: 18px; text-align: left; }
         .top-title { font-size: 17px; font-weight: 600; margin-bottom: 10px; }
         .top-grid {
-            display: flex;
-            flex-wrap: nowrap;
+            display: grid;
             gap: 10px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            padding-bottom: 8px;
-            scroll-snap-type: x mandatory;
-            -webkit-overflow-scrolling: touch;
+            /* Mobile: 4 cột */
+            grid-template-columns: repeat(4, 1fr);
+            /* PC: responsive, tối đa 10 cột */
         }
-        /* Ẩn thanh cuộn nhưng vẫn cuộn được */
-        .top-grid::-webkit-scrollbar { height: 4px; }
-        .top-grid::-webkit-scrollbar-track { background: #222; border-radius: 4px; }
-        .top-grid::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        /* Responsive cho PC */
+        @media (min-width: 600px) {
+            .top-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+        @media (min-width: 768px) {
+            .top-grid { grid-template-columns: repeat(6, 1fr); }
+        }
+        @media (min-width: 900px) {
+            .top-grid { grid-template-columns: repeat(7, 1fr); }
+        }
+        @media (min-width: 1024px) {
+            .top-grid { grid-template-columns: repeat(8, 1fr); }
+        }
+        @media (min-width: 1200px) {
+            .top-grid { grid-template-columns: repeat(9, 1fr); }
+        }
+        @media (min-width: 1400px) {
+            .top-grid { grid-template-columns: repeat(10, 1fr); }
+        }
         .top-card {
-            flex: 0 0 100px; /* Chiều rộng cố định 100px */
-            min-width: 100px;
+            width: 100%;
             background: #1a1a1a;
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             transition: transform 0.2s;
-            scroll-snap-align: start;
-        }
-        @media (min-width: 500px) {
-            .top-card { flex: 0 0 110px; min-width: 110px; }
         }
         .top-card:hover { transform: scale(1.03); }
         .top-card-wrapper { position: relative; }
@@ -475,12 +482,9 @@
         <div id="film-summary"></div>
         <div id="film-summary-toggle"><span>Xem thêm</span></div>
 
-    <div class="player-container">
-            <div id="overlay" onclick="handlePlay()">
-                <p class="text-support">Ủng hộ chi phí duy trì và vận hành kênh Lu Yêu Phim</p>
-                <button class="btn-shopee-main">🛒 MỞ SHOPEE & QUAY LẠI XEM FULL</button>
-                <p class="text-note">(Xin lỗi nếu overlay xuất hiện nhiều; đây là một phần chi phí duy trì kênh. App Shopee sẽ mở ở tab mới, bạn có thể quay lại đây sau khi hoàn tất.)</p>
-            </div>
+        <div class="player-container">
+            <!-- Overlay Shopee đã được tắt hoàn toàn -->
+            <div id="overlay" style="display: none !important;"></div>
             <!-- Placeholder cho video ngoài (Tập 1 với Fanpage link) -->
             <div id="external-video-placeholder" onclick="openExternalVideo()">
                 <img id="external-video-thumbnail" src="" alt="Video thumbnail" style="display: block;" onerror="this.style.display='none'">
@@ -1021,7 +1025,7 @@ function renderTopMovies() {
             gridEl.appendChild(createCard(item, true));   // mobile: có click
         }
         if (pcGrid) {
-            pcGrid.appendChild(createCard(item, false));  // PC: chỉ xem
+            pcGrid.appendChild(createCard(item, true));  // PC: cũng có click
         }
     });
 
@@ -1524,10 +1528,8 @@ function loadMovieById(id, opts) {
                 var shopeeUrl = item.shopeeLink.trim();
                 window.open(shopeeUrl, '_blank');
                 
-                // Sau đó tự động chuyển sang tập đó (sau 500ms để đảm bảo Shopee đã mở)
-                setTimeout(function() {
-                    changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
-                }, 500);
+                // Ngay lập tức chuyển sang tập đó (không đợi delay)
+                changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
             } else {
                 // Tập 1 hoặc không có Shopee link → chuyển tập bình thường
                 changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
@@ -1611,17 +1613,7 @@ document.addEventListener('DOMContentLoaded', function() {
 var myShopeeLink = "https://s.shopee.vn/9pXNbUiEFE"; // Link mặc định (fallback)
 var currentShopeeLink = myShopeeLink; // Link Shopee của tập hiện tại
 
-function handlePlay() {
-    var overlay = document.getElementById('overlay');
-    // Tập 1: không mở Shopee, chỉ tắt overlay (nếu có)
-    if (currentEpisode === 1) {
-        if (overlay) overlay.style.display = 'none';
-        return;
-    }
-    // Dùng link Shopee của tập hiện tại (hoặc mặc định)
-    window.open(currentShopeeLink, '_blank');
-    if (overlay) overlay.style.display = 'none';
-}
+// handlePlay() đã được xóa vì overlay Shopee đã được tắt hoàn toàn
 
 
 var currentExternalVideoUrl = null;
@@ -1725,19 +1717,9 @@ function changeEpisode(epNum, source, filmNameOverride, clickedEl, movieId, shop
         currentShopeeLink = null;
     }
     
-    // Logic hiển thị overlay Shopee:
-    // - Chỉ hiển thị khi: Tập 2+ (không phải tập 1) VÀ có embedUrl Dailymotion chuẩn VÀ không có link fanpage/YouTube
-    // - Tập 1: KHÔNG có overlay Shopee (dù có embed hay không)
+    // Overlay Shopee đã được tắt hoàn toàn - luôn ẩn
     if (overlay) {
-        var shouldShowOverlay = false;
-        if (currentEpisode !== 1 && currentEpisode !== 'FULL') {
-            // Tập 2+ và có embedUrl Dailymotion chuẩn và không có link fanpage/YouTube
-            if (isDailymotionEmbed && !shouldUseExternalLink) {
-                shouldShowOverlay = true;
-            }
-        }
-        overlay.style.display = shouldShowOverlay ? 'flex' : 'none';
-        console.log(`Tập ${currentEpisode} - Overlay Shopee:`, shouldShowOverlay ? 'HIỂN THỊ' : 'ẨN', "(isDailymotionEmbed:", isDailymotionEmbed, ", shouldUseExternalLink:", shouldUseExternalLink, ")");
+        overlay.style.display = 'none';
     }
     
     // Nếu có link fanpage/YouTube (và không có embed Dailymotion) → hiển thị placeholder (cho TẤT CẢ tập)
