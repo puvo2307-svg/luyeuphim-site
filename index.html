@@ -1269,7 +1269,19 @@ function renderBanners() {
     
     console.log("🎬 renderBanners() - Tổng số banner:", banners.length);
     
-    if (banners.length === 0) {
+    // Filter banner: chỉ lấy banner có URL hợp lệ
+    var validBanners = banners.filter(function(bannerItem) {
+        var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
+        var isValid = bannerUrl && typeof bannerUrl === 'string' && bannerUrl.trim().length > 0 && bannerUrl.startsWith('http');
+        if (!isValid) {
+            console.warn("  ⚠️ Banner bị bỏ qua (URL không hợp lệ):", bannerUrl);
+        }
+        return isValid;
+    });
+    
+    console.log("🎬 renderBanners() - Số banner hợp lệ:", validBanners.length);
+    
+    if (validBanners.length === 0) {
         if (container) container.style.display = "none";
         if (containerPc) containerPc.style.display = "none";
         return;
@@ -1284,11 +1296,11 @@ function renderBanners() {
             wrapper.innerHTML = "";
             dots.innerHTML = "";
             
-            banners.forEach(function(bannerItem, index) {
+            validBanners.forEach(function(bannerItem, index) {
                 var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
                 var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
                 
-                console.log(`  📸 Banner ${index + 1}:`, bannerUrl);
+                console.log(`  📸 Banner ${index + 1}/${validBanners.length}:`, bannerUrl, "MovieId:", movieId || "null");
                 
                 var slide = document.createElement('div');
                 slide.className = 'banner-slide';
@@ -1300,6 +1312,9 @@ function renderBanners() {
                     slide.onclick = function() {
                         loadMovieById(movieId);
                     };
+                    console.log(`  🔗 Banner ${index + 1} có link đến phim:`, movieId);
+                } else {
+                    console.log(`  ⚠️ Banner ${index + 1} không có link (movieId: ${movieId || 'null'})`);
                 }
                 
                 var img = document.createElement('img');
@@ -1343,11 +1358,11 @@ function renderBanners() {
             wrapperPc.innerHTML = "";
             dotsPc.innerHTML = "";
             
-            banners.forEach(function(bannerItem, index) {
+            validBanners.forEach(function(bannerItem, index) {
                 var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
                 var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
                 
-                console.log(`  📸 Banner PC ${index + 1}:`, bannerUrl);
+                console.log(`  📸 Banner PC ${index + 1}/${validBanners.length}:`, bannerUrl, "MovieId:", movieId || "null");
                 
                 var slide = document.createElement('div');
                 slide.className = 'banner-slide';
@@ -1359,6 +1374,9 @@ function renderBanners() {
                     slide.onclick = function() {
                         loadMovieById(movieId);
                     };
+                    console.log(`  🔗 Banner ${index + 1} có link đến phim:`, movieId);
+                } else {
+                    console.log(`  ⚠️ Banner ${index + 1} không có link (movieId: ${movieId || 'null'})`);
                 }
                 
                 var img = document.createElement('img');
@@ -1403,12 +1421,22 @@ function goToBanner(index, device) {
 }
 
 function nextBanner(device) {
-    currentBannerIndex = (currentBannerIndex + 1) % banners.length;
+    // Lấy số banner hợp lệ từ container
+    var container = device === 'pc' ? document.getElementById('banner-carousel-pc') : document.getElementById('banner-carousel');
+    if (!container) return;
+    var slides = container.querySelectorAll('.banner-slide');
+    var totalBanners = slides ? slides.length : banners.length;
+    currentBannerIndex = (currentBannerIndex + 1) % totalBanners;
     updateBannerPosition(device);
 }
 
 function prevBanner(device) {
-    currentBannerIndex = (currentBannerIndex - 1 + banners.length) % banners.length;
+    // Lấy số banner hợp lệ từ container
+    var container = device === 'pc' ? document.getElementById('banner-carousel-pc') : document.getElementById('banner-carousel');
+    if (!container) return;
+    var slides = container.querySelectorAll('.banner-slide');
+    var totalBanners = slides ? slides.length : banners.length;
+    currentBannerIndex = (currentBannerIndex - 1 + totalBanners) % totalBanners;
     updateBannerPosition(device);
 }
 
@@ -1439,7 +1467,11 @@ function updateBannerPosition(device) {
 
 function startAutoSlide(device) {
     stopAutoSlide();
-    if (banners.length <= 1) return;
+    var container = device === 'pc' ? document.getElementById('banner-carousel-pc') : document.getElementById('banner-carousel');
+    if (!container) return;
+    var slides = container.querySelectorAll('.banner-slide');
+    var totalBanners = slides ? slides.length : 0;
+    if (totalBanners <= 1) return;
     bannerInterval = setInterval(function() {
         nextBanner(device);
     }, 5000); // Đổi banner mỗi 5 giây
