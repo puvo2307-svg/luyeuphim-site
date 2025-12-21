@@ -301,7 +301,8 @@
         }
         @media (min-width: 900px) {
             .banner-container {
-                height: 400px; /* PC - cao hơn */
+                height: 500px; /* PC - cao hơn, full màn hình hơn */
+                max-width: 100%;
             }
         }
         .banner-wrapper {
@@ -493,8 +494,8 @@
         <a id="youtube-link" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
     </div>
 
-    <!-- LƯU Ý (DISCLAIMER) - HIỂN THỊ Ở TRANG CHỦ MOBILE -->
-    <div style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
+    <!-- LƯU Ý (DISCLAIMER) - HIỂN THỊ Ở TRANG CHỦ MOBILE (ẨN KHI XEM PHIM) -->
+    <div id="disclaimer-home" style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
         <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Fanpage: <a href="https://www.facebook.com/luyeuphim.dramashorts/" target="_blank" rel="noopener noreferrer" style="color: #ee4d2d; text-decoration: underline;"><strong>Lu Yêu Phim</strong></a>
     </div>
 
@@ -1266,6 +1267,8 @@ function renderBanners() {
     // PC banner
     var containerPc = document.getElementById('banner-carousel-pc');
     
+    console.log("🎬 renderBanners() - Tổng số banner:", banners.length);
+    
     if (banners.length === 0) {
         if (container) container.style.display = "none";
         if (containerPc) containerPc.style.display = "none";
@@ -1285,9 +1288,12 @@ function renderBanners() {
                 var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
                 var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
                 
+                console.log(`  📸 Banner ${index + 1}:`, bannerUrl);
+                
                 var slide = document.createElement('div');
                 slide.className = 'banner-slide';
                 slide.style.transform = `translateX(${index * 100}%)`;
+                slide.style.background = '#1a1a1a'; // Background mặc định
                 
                 if (movieId && movieIndex[movieId]) {
                     slide.style.cursor = 'pointer';
@@ -1299,8 +1305,18 @@ function renderBanners() {
                 var img = document.createElement('img');
                 img.src = bannerUrl;
                 img.alt = `Banner ${index + 1}`;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.onload = function() {
+                    console.log(`  ✅ Banner ${index + 1} loaded successfully`);
+                };
                 img.onerror = function() {
+                    console.error(`  ❌ Banner ${index + 1} failed to load:`, bannerUrl);
+                    // Thay vì ẩn, hiển thị placeholder hoặc background
                     this.style.display = 'none';
+                    slide.style.background = 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)';
+                    slide.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 14px;">Banner không tải được</div>';
                 };
                 
                 slide.appendChild(img);
@@ -1331,9 +1347,12 @@ function renderBanners() {
                 var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
                 var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
                 
+                console.log(`  📸 Banner PC ${index + 1}:`, bannerUrl);
+                
                 var slide = document.createElement('div');
                 slide.className = 'banner-slide';
                 slide.style.transform = `translateX(${index * 100}%)`;
+                slide.style.background = '#1a1a1a'; // Background mặc định
                 
                 if (movieId && movieIndex[movieId]) {
                     slide.style.cursor = 'pointer';
@@ -1345,8 +1364,18 @@ function renderBanners() {
                 var img = document.createElement('img');
                 img.src = bannerUrl;
                 img.alt = `Banner ${index + 1}`;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.onload = function() {
+                    console.log(`  ✅ Banner PC ${index + 1} loaded successfully`);
+                };
                 img.onerror = function() {
+                    console.error(`  ❌ Banner PC ${index + 1} failed to load:`, bannerUrl);
+                    // Thay vì ẩn, hiển thị placeholder hoặc background
                     this.style.display = 'none';
+                    slide.style.background = 'linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%)';
+                    slide.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #555; font-size: 14px;">Banner không tải được</div>';
                 };
                 
                 slide.appendChild(img);
@@ -1685,7 +1714,12 @@ function loadMovieById(id, opts) {
 
     var first = getFirstEpisodeObj(episodes, opts.preferredEp);
     var movieSection = document.getElementById('movie-section');
-    if (movieSection) movieSection.style.display = 'block';
+    if (movieSection) {
+        movieSection.style.display = 'block';
+        // Ẩn phần "Lưu ý" ở trang chủ khi đang xem phim
+        var disclaimerHome = document.getElementById('disclaimer-home');
+        if (disclaimerHome) disclaimerHome.style.display = 'none';
+    }
 
     // Hiển thị tóm tắt phim
     var summaryEl = document.getElementById('film-summary');
