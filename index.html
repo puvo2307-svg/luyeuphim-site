@@ -422,8 +422,15 @@
         <a id="youtube-link-pc" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
     </div>
 
+    <div class="donate-box" style="max-width: 900px; margin: 20px auto 0 auto;">
+        <div class="donate-text-sub" id="donate-content-pc">
+            Vì vấn đề bản quyền nên thời lượng các tập phim khá ngắn, mong mọi người thông cảm cho team 🙇<br><br>
+            Toàn bộ phim trên xemfulltap.live đều là miễn phí, chúng mình chỉ đặt click shopee để duy trì hoạt động. Cảm ơn các bạn đã ủng hộ và hãy chia sẻ nếu thấy hay nha!!!
+        </div>
+    </div>
+
     <div style="max-width: 900px; margin: 20px auto 0 auto; font-size: 12px; color: #888; text-align: left; padding: 0 12px;">
-        <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
+        <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Fanpage: <a href="https://www.facebook.com/luyeuphim.dramashorts/" target="_blank" rel="noopener noreferrer" style="color: #ee4d2d; text-decoration: underline;"><strong>Lu Yêu Phim</strong></a>
     </div>
 </div>
 
@@ -482,7 +489,7 @@
         <div id="film-summary"></div>
         <div id="film-summary-toggle"><span>Xem thêm</span></div>
 
-        <div class="player-container">
+    <div class="player-container">
             <!-- Overlay Shopee đã được tắt hoàn toàn -->
             <div id="overlay" style="display: none !important;"></div>
             <!-- Placeholder cho video ngoài (Tập 1 với Fanpage link) -->
@@ -498,7 +505,7 @@
         <div id="episode-list" class="episode-list"></div>
 
         <div style="margin-top: 14px; font-size: 12px; color: #888; text-align: left;">
-            <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
+            <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Fanpage: <a href="https://www.facebook.com/luyeuphim.dramashorts/" target="_blank" rel="noopener noreferrer" style="color: #ee4d2d; text-decoration: underline;"><strong>Lu Yêu Phim</strong></a>
         </div>
     </div>
     </div>
@@ -569,7 +576,9 @@ function useDefaultConfig() {
         },
         social: {
             fanpage: "https://www.facebook.com/groups/luyeuphim",
-            youtube: "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1"
+            youtube: "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1",
+            fanpageContact: "https://www.facebook.com/luyeuphim.dramashorts/",
+            youtubeRedirect: "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1"
         }
     };
     updateDonateInfo();
@@ -1518,17 +1527,49 @@ function loadMovieById(id, opts) {
         }
         div.onclick = function() {
             var clickedDiv = this; // Lưu reference đến div element
-            // Kiểm tra nếu là tập 2+ và có Shopee link
             var epNum = Number(item.ep);
             var isEp2Plus = !isNaN(epNum) && epNum > 1;
             var hasShopeeLink = item.shopeeLink && item.shopeeLink.trim() && item.shopeeLink.trim() !== 'null';
             
-            if (isEp2Plus && hasShopeeLink) {
+            // Kiểm tra embedUrl có phải là Dailymotion embed không
+            var embedUrlStr = item.embedUrl ? String(item.embedUrl).trim() : '';
+            var isDailymotionEmbed = embedUrlStr && (
+                embedUrlStr.includes('geo.dailymotion.com') || 
+                embedUrlStr.includes('dailymotion.com/embed') ||
+                embedUrlStr.includes('dailymotion.com/player.html')
+            );
+            
+            // Kiểm tra có videoUrl là link fanpage/YouTube không
+            var videoUrlStr = item.videoUrl ? String(item.videoUrl).trim() : '';
+            var isExternalLink = videoUrlStr && (
+                videoUrlStr.includes('facebook.com') || 
+                videoUrlStr.includes('fb.com') || 
+                videoUrlStr.includes('/reel/') ||
+                videoUrlStr.includes('youtube.com') || 
+                videoUrlStr.includes('youtu.be')
+            );
+            
+            // Logic: Nếu là tập 2+ và có embed Dailymotion → mở Shopee → mở YouTube redirect
+            if (isEp2Plus && isDailymotionEmbed && hasShopeeLink) {
                 // Mở Shopee link trong tab mới
                 var shopeeUrl = item.shopeeLink.trim();
                 window.open(shopeeUrl, '_blank');
                 
-                // Ngay lập tức chuyển sang tập đó (không đợi delay)
+                // Sau đó mở YouTube redirect link từ config
+                var youtubeRedirectUrl = (siteConfig && siteConfig.social && siteConfig.social.youtubeRedirect) 
+                    ? siteConfig.social.youtubeRedirect 
+                    : "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+                setTimeout(function() {
+                    window.open(youtubeRedirectUrl, '_blank');
+                }, 300);
+                
+                // KHÔNG chuyển sang tập đó nữa - chỉ mở Shopee và YouTube
+                return;
+            } else if (isEp2Plus && hasShopeeLink && !isDailymotionEmbed) {
+                // Tập 2+ có Shopee link nhưng KHÔNG phải embed Dailymotion (có thể là link fanpage/YouTube)
+                // → Giữ nguyên logic cũ: mở Shopee → chuyển tập
+                var shopeeUrl = item.shopeeLink.trim();
+                window.open(shopeeUrl, '_blank');
                 changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
             } else {
                 // Tập 1 hoặc không có Shopee link → chuyển tập bình thường
