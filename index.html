@@ -413,7 +413,6 @@
     <div class="link-buttons">
         <a id="fanpage-link-pc" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
         <a id="youtube-link-pc" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
-        <button class="link-btn-primary link-btn" onclick="showDonateInfo()">Donate duy trì kênh</button>
     </div>
 
     <div style="max-width: 900px; margin: 20px auto 0 auto; font-size: 12px; color: #888; text-align: left; padding: 0 12px;">
@@ -457,21 +456,16 @@
         <div id="genre-grid" class="top-grid"></div>
     </div>
 
-    <!-- NÚT CỘNG ĐỒNG + DONATE -->
+    <!-- NÚT CỘNG ĐỒNG -->
     <div class="link-buttons">
         <a id="fanpage-link" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Tham gia nhóm Fanpage</a>
         <a id="youtube-link" class="link-btn" href="#" target="_blank" rel="noopener noreferrer">Theo dõi &amp; nhấn chuông YTB</a>
-        <button class="link-btn-primary link-btn" onclick="showDonateInfo()">Donate duy trì kênh</button>
     </div>
 
     <div class="donate-box">
-        <div class="donate-text-title" id="donate-title">Ủng hộ duy trì kênh</div>
         <div class="donate-text-sub" id="donate-content">
-            Ngân hàng: <strong id="donate-bank">MB Bank</strong><br>
-            Chủ tài khoản: <strong id="donate-account-name">LE THI TUYET HOA</strong><br>
-            Số tài khoản: <strong class="stk" id="donate-account-number">9323082004</strong><br>
-            Ghi chú chuyển khoản: <strong id="donate-note">Ung ho Lu Yeu Phim</strong><br><br>
-            <span id="donate-message">Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.</span>
+            Vì vấn đề bản quyền nên thời lượng các tập phim khá ngắn, mong mọi người thông cảm cho team 🙇<br><br>
+            Toàn bộ phim trên xemfulltap.live đều là miễn phí, chúng mình chỉ đặt click shopee để duy trì hoạt động. Cảm ơn các bạn đã ủng hộ và hãy chia sẻ nếu thấy hay nha!!!
         </div>
     </div>
 
@@ -503,22 +497,8 @@
             <strong>Lưu ý:</strong> Phần dịch + lồng tiếng (AI) tạo bởi team Lu Yêu Phim. Video gốc lấy từ các nguồn phổ biến trên Internet. Nếu bạn cho rằng quyền lợi bị ảnh hưởng, vui lòng liên hệ để gỡ. Email: <strong>pu.truong.2307@gmail.com</strong>
         </div>
     </div>
-</div>
+    </div>
 
-<!-- MODAL DONATE -->
-<div id="donate-modal-backdrop" class="donate-modal-backdrop" onclick="hideDonateInfo(event)">
-    <div class="donate-modal">
-        <div class="donate-modal-title" id="donate-modal-title">Ủng hộ duy trì kênh</div>
-        <div class="donate-text-sub" id="donate-modal-content">
-            Ngân hàng: <strong id="donate-modal-bank">MB Bank</strong><br>
-            Chủ tài khoản: <strong id="donate-modal-account-name">LE THI TUYET HOA</strong><br>
-            Số tài khoản: <strong class="stk" id="donate-modal-account-number">9323082004</strong><br>
-            Ghi chú chuyển khoản: <strong id="donate-modal-note">Ung ho Lu Yeu Phim</strong><br><br>
-            <span id="donate-modal-message">Cảm ơn bạn đã ủng hộ để kênh có thể duy trì hoạt động lâu dài.</span>
-        </div>
-        <button class="donate-modal-close" onclick="hideDonateInfo()">Đã hiểu</button>
-    </div>
-    </div>
 
     <script>
 // ========== KIỂM TRA THIẾT BỊ ==========
@@ -1533,7 +1513,25 @@ function loadMovieById(id, opts) {
             div.textContent = "Tập " + item.ep;
         }
         div.onclick = function() {
-            changeEpisode(item.ep, item.embedUrl, data.displayName || id, this, id, item.shopeeLink, item.videoUrl);
+            var clickedDiv = this; // Lưu reference đến div element
+            // Kiểm tra nếu là tập 2+ và có Shopee link
+            var epNum = Number(item.ep);
+            var isEp2Plus = !isNaN(epNum) && epNum > 1;
+            var hasShopeeLink = item.shopeeLink && item.shopeeLink.trim() && item.shopeeLink.trim() !== 'null';
+            
+            if (isEp2Plus && hasShopeeLink) {
+                // Mở Shopee link trong tab mới
+                var shopeeUrl = item.shopeeLink.trim();
+                window.open(shopeeUrl, '_blank');
+                
+                // Sau đó tự động chuyển sang tập đó (sau 500ms để đảm bảo Shopee đã mở)
+                setTimeout(function() {
+                    changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
+                }, 500);
+            } else {
+                // Tập 1 hoặc không có Shopee link → chuyển tập bình thường
+                changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
+            }
         };
         epList.appendChild(div);
     });
@@ -1625,18 +1623,6 @@ function handlePlay() {
     if (overlay) overlay.style.display = 'none';
 }
 
-function showDonateInfo() {
-    var backdrop = document.getElementById('donate-modal-backdrop');
-    if (backdrop) backdrop.style.display = 'flex';
-}
-
-function hideDonateInfo(evt) {
-    if (evt && evt.target && !evt.target.classList.contains('donate-modal-backdrop') && evt.target.closest('.donate-modal') !== null) {
-        if (!evt.target.classList.contains('donate-modal-close')) return;
-    }
-    var backdrop = document.getElementById('donate-modal-backdrop');
-    if (backdrop) backdrop.style.display = 'none';
-}
 
 var currentExternalVideoUrl = null;
 
