@@ -227,9 +227,25 @@
   ],
   "banners": [
     {
+      "url": "https://i.ytimg.com/vi/Z4-oVvKE8KA/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLCygJ3F7wIuXZBqPLxt_HfC3xwO6w",
+      "movieId": "Võ Công Giả Dị Năng"
+    },
+    {
+      "url": "https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcTdsFJrJG0hRKoB7Y05J3zW_7vI9KGYBwRJXbV9U4fxoD10XYex",
+      "movieId": "Bố_Tôi_Là_Trùm_Ẩn_Danh"
+    },
+    {
       "url": "https://i.ytimg.com/vi/FJlNGuzfGb0/hqdefault.jpg",
       "movieId": "Trở_Lại_Đường_Đua_(56)"
+    },
+    {
+      "url": "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcSGsZua1NlS9C5UIV_lsQDk23c11PqpoA5r4cOBFpArw9Dsup54",
+      "movieId": "Đệ Nhất Phá Gia - Phò Mã Báo Thù"
+    },
+    {
+      "url": "https://i.ytimg.com/vi/gcynAst7mg4/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLB1y0KkT6xurbVLVqqNTKpyECY96A",
+      "movieId": "08.九岁神探（60集）崔煜森&魏嘉"
     }
   ],
-  "updated": "2025-12-21T07:48:34.701079"
+  "updated": "2025-12-21T08:02:00.733890"
 }
