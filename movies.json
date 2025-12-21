@@ -271,8 +271,35 @@
           "shopeeLink": null
         }
       ]
+    },
+    {
+      "name": "03.乱世悍卒娶媳妇就变强（60集）马嘉苒&吕岳",
+      "vietName": "03.乱世悍卒娶媳妇就变强（60集）马嘉苒&吕岳",
+      "summary": "",
+      "top": "",
+      "poster": "",
+      "year": "",
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w59fu",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w59fw",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        }
+      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-21T11:53:58.093456"
+  "updated": "2025-12-21T12:18:55.775855"
 }
