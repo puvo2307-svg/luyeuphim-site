@@ -187,6 +187,20 @@
           "videoUrl": "https://www.facebook.com/share/v/1AHSRhBTnN/",
           "uploadDate": "2025-12-20",
           "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/1EodXfYnNz/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/19zxcYfZaL/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
     },
@@ -247,5 +261,5 @@
       "movieId": "08.九岁神探（60集）崔煜森&魏嘉"
     }
   ],
-  "updated": "2025-12-21T08:10:27.842646"
+  "updated": "2025-12-21T08:33:54.606268"
 }
