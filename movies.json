@@ -169,8 +169,62 @@
           "shopeeLink": "https://s.shopee.vn/9pXNbUiEFE"
         }
       ]
+    },
+    {
+      "name": "Trở_Lại_Đường_Đua_(56)",
+      "vietName": "Trở Lại Đường Đua",
+      "summary": "",
+      "top": 6,
+      "poster": "https://bbs.dyyjpro.com/assets/files/2025-05-18/1747553305-806598-28.jpg",
+      "year": 2024,
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/1AHSRhBTnN/",
+          "uploadDate": "2025-12-20",
+          "shopeeLink": null
+        }
+      ]
+    },
+    {
+      "name": "08.九岁神探（60集）崔煜森&魏嘉",
+      "vietName": "08.九岁神探（60集）崔煜森&魏嘉",
+      "summary": "",
+      "top": "",
+      "poster": "",
+      "year": "",
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w4iyg",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w4iyk",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w4iyi",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        }
+      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-21T01:46:19.061528"
+  "updated": "2025-12-21T03:19:50.129725"
 }
