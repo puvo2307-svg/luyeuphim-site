@@ -250,6 +250,20 @@
       "allowPC": false,
       "episodes": [
         {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w4z0k",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w4z0i",
+          "videoUrl": "",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        },
+        {
           "ep": 3,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w4z0g",
           "videoUrl": "",
@@ -265,5 +279,5 @@
       "movieId": "Võ Công Giả Dị Năng"
     }
   ],
-  "updated": "2025-12-21T08:52:12.139608"
+  "updated": "2025-12-21T09:12:47.781580"
 }
