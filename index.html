@@ -1714,7 +1714,7 @@ function loadMovieById(id, opts) {
                 videoUrlStr.includes('youtu.be')
             );
             
-            // Logic: Nếu là tập 2+ và có embed Dailymotion → mở Shopee → mở YouTube redirect
+            // Logic: Nếu là tập 2+ và có embed Dailymotion → mở Shopee → mở YouTube redirect → chuyển sang tập đó
             if (isEp2Plus && isDailymotionEmbed && hasShopeeLink) {
                 // Mở Shopee link trong tab mới
                 var shopeeUrl = item.shopeeLink.trim();
@@ -1728,7 +1728,8 @@ function loadMovieById(id, opts) {
                     window.open(youtubeRedirectUrl, '_blank');
                 }, 300);
                 
-                // KHÔNG chuyển sang tập đó nữa - chỉ mở Shopee và YouTube
+                // CHUYỂN SANG TẬP ĐÓ trong tab hiện tại để khi quay lại sẽ tự động play
+                changeEpisode(item.ep, item.embedUrl, data.displayName || id, clickedDiv, id, item.shopeeLink, item.videoUrl);
                 return;
             } else if (isEp2Plus && hasShopeeLink && !isDailymotionEmbed) {
                 // Tập 2+ có Shopee link nhưng KHÔNG phải embed Dailymotion (có thể là link fanpage/YouTube)
