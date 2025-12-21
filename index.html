@@ -412,6 +412,14 @@
         </div>
     </div>
 
+    <!-- BANNER CAROUSEL - PC -->
+    <div id="banner-carousel-pc" class="banner-container" style="max-width: 900px; margin: 0 auto 20px auto; display:none;">
+        <div class="banner-wrapper"></div>
+        <div class="banner-dots"></div>
+        <button class="banner-prev">‹</button>
+        <button class="banner-next">›</button>
+    </div>
+
     <!-- Dải phim đề xuất chỉ để xem, không click, không mở Shopee -->
     <div id="top-section-pc" class="top-section" style="max-width: 900px; width: 100%; margin-bottom: 24px;">
         <div class="top-title">📺 Phim đề xuất</div>
@@ -1253,93 +1261,158 @@ var currentBannerIndex = 0;
 var bannerInterval = null;
 
 function renderBanners() {
+    // Mobile banner
     var container = document.getElementById('banner-carousel');
-    var wrapper = document.querySelector('.banner-wrapper');
-    var dots = document.querySelector('.banner-dots');
+    // PC banner
+    var containerPc = document.getElementById('banner-carousel-pc');
     
-    if (!container || !wrapper || !dots || banners.length === 0) {
+    if (banners.length === 0) {
         if (container) container.style.display = "none";
+        if (containerPc) containerPc.style.display = "none";
         return;
     }
-
-    wrapper.innerHTML = "";
-    dots.innerHTML = "";
-    currentBannerIndex = 0;
-
-    banners.forEach(function(bannerItem, index) {
-        // Banner có thể là object {url, movieId} hoặc string (backward compatibility)
-        var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
-        var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
+    
+    // Render cho mobile
+    if (container) {
+        var wrapper = container.querySelector('.banner-wrapper');
+        var dots = container.querySelector('.banner-dots');
         
-        // Slide
-        var slide = document.createElement('div');
-        slide.className = 'banner-slide';
-        slide.style.transform = `translateX(${index * 100}%)`;
-        
-        // Nếu có movieId thì làm cho clickable
-        if (movieId && movieIndex[movieId]) {
-            slide.style.cursor = 'pointer';
-            slide.onclick = function() {
-                // Click vào banner → mở phim đó
-                loadMovieById(movieId);
-            };
+        if (wrapper && dots) {
+            wrapper.innerHTML = "";
+            dots.innerHTML = "";
+            
+            banners.forEach(function(bannerItem, index) {
+                var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
+                var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
+                
+                var slide = document.createElement('div');
+                slide.className = 'banner-slide';
+                slide.style.transform = `translateX(${index * 100}%)`;
+                
+                if (movieId && movieIndex[movieId]) {
+                    slide.style.cursor = 'pointer';
+                    slide.onclick = function() {
+                        loadMovieById(movieId);
+                    };
+                }
+                
+                var img = document.createElement('img');
+                img.src = bannerUrl;
+                img.alt = `Banner ${index + 1}`;
+                img.onerror = function() {
+                    this.style.display = 'none';
+                };
+                
+                slide.appendChild(img);
+                wrapper.appendChild(slide);
+                
+                var dot = document.createElement('div');
+                dot.className = 'banner-dot' + (index === 0 ? ' active' : '');
+                dot.onclick = function() { goToBanner(index, 'mobile'); };
+                dots.appendChild(dot);
+            });
+            
+            container.style.display = "block";
+            updateBannerPosition('mobile');
+            startAutoSlide('mobile');
         }
+    }
+    
+    // Render cho PC
+    if (containerPc) {
+        var wrapperPc = containerPc.querySelector('.banner-wrapper');
+        var dotsPc = containerPc.querySelector('.banner-dots');
         
-        var img = document.createElement('img');
-        img.src = bannerUrl;
-        img.alt = `Banner ${index + 1}`;
-        img.onerror = function() {
-            this.style.display = 'none';
-        };
-        
-        slide.appendChild(img);
-        wrapper.appendChild(slide);
-        
-        // Dot
-        var dot = document.createElement('div');
-        dot.className = 'banner-dot' + (index === 0 ? ' active' : '');
-        dot.onclick = function() { goToBanner(index); };
-        dots.appendChild(dot);
-    });
-
-    container.style.display = "block";
-    updateBannerPosition();
-    startAutoSlide();
+        if (wrapperPc && dotsPc) {
+            wrapperPc.innerHTML = "";
+            dotsPc.innerHTML = "";
+            
+            banners.forEach(function(bannerItem, index) {
+                var bannerUrl = typeof bannerItem === 'object' ? bannerItem.url : bannerItem;
+                var movieId = typeof bannerItem === 'object' ? bannerItem.movieId : null;
+                
+                var slide = document.createElement('div');
+                slide.className = 'banner-slide';
+                slide.style.transform = `translateX(${index * 100}%)`;
+                
+                if (movieId && movieIndex[movieId]) {
+                    slide.style.cursor = 'pointer';
+                    slide.onclick = function() {
+                        loadMovieById(movieId);
+                    };
+                }
+                
+                var img = document.createElement('img');
+                img.src = bannerUrl;
+                img.alt = `Banner ${index + 1}`;
+                img.onerror = function() {
+                    this.style.display = 'none';
+                };
+                
+                slide.appendChild(img);
+                wrapperPc.appendChild(slide);
+                
+                var dot = document.createElement('div');
+                dot.className = 'banner-dot' + (index === 0 ? ' active' : '');
+                dot.onclick = function() { goToBanner(index, 'pc'); };
+                dotsPc.appendChild(dot);
+            });
+            
+            containerPc.style.display = "block";
+            updateBannerPosition('pc');
+            startAutoSlide('pc');
+        }
+    }
+    
+    currentBannerIndex = 0;
 }
 
-function goToBanner(index) {
+function goToBanner(index, device) {
     currentBannerIndex = index;
-    updateBannerPosition();
-    resetAutoSlide();
+    updateBannerPosition(device);
+    resetAutoSlide(device);
 }
 
-function nextBanner() {
+function nextBanner(device) {
     currentBannerIndex = (currentBannerIndex + 1) % banners.length;
-    updateBannerPosition();
+    updateBannerPosition(device);
 }
 
-function prevBanner() {
+function prevBanner(device) {
     currentBannerIndex = (currentBannerIndex - 1 + banners.length) % banners.length;
-    updateBannerPosition();
+    updateBannerPosition(device);
 }
 
-function updateBannerPosition() {
-    var wrapper = document.querySelector('.banner-wrapper');
-    if (!wrapper) return;
+function updateBannerPosition(device) {
+    // Update cả mobile và PC cùng lúc
+    var containers = [];
+    if (device === 'pc' || !device) {
+        var pcContainer = document.getElementById('banner-carousel-pc');
+        if (pcContainer) containers.push(pcContainer);
+    }
+    if (device === 'mobile' || !device) {
+        var mobileContainer = document.getElementById('banner-carousel');
+        if (mobileContainer) containers.push(mobileContainer);
+    }
     
-    wrapper.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
-    
-    var dots = document.querySelectorAll('.banner-dot');
-    dots.forEach(function(dot, index) {
-        dot.classList.toggle('active', index === currentBannerIndex);
+    containers.forEach(function(container) {
+        var wrapper = container.querySelector('.banner-wrapper');
+        if (!wrapper) return;
+        
+        wrapper.style.transform = `translateX(-${currentBannerIndex * 100}%)`;
+        
+        var dots = container.querySelectorAll('.banner-dot');
+        dots.forEach(function(dot, index) {
+            dot.classList.toggle('active', index === currentBannerIndex);
+        });
     });
 }
 
-function startAutoSlide() {
+function startAutoSlide(device) {
     stopAutoSlide();
     if (banners.length <= 1) return;
     bannerInterval = setInterval(function() {
-        nextBanner();
+        nextBanner(device);
     }, 5000); // Đổi banner mỗi 5 giây
 }
 
@@ -1350,31 +1423,32 @@ function stopAutoSlide() {
     }
 }
 
-function resetAutoSlide() {
+function resetAutoSlide(device) {
     stopAutoSlide();
-    startAutoSlide();
+    startAutoSlide(device);
 }
 
 // Event listeners cho banner
 document.addEventListener('DOMContentLoaded', function() {
+    // Mobile banner
     var bannerContainer = document.getElementById('banner-carousel');
     if (bannerContainer) {
         bannerContainer.addEventListener('mouseenter', stopAutoSlide);
-        bannerContainer.addEventListener('mouseleave', startAutoSlide);
+        bannerContainer.addEventListener('mouseleave', function() { startAutoSlide('mobile'); });
         
         var nextBtn = bannerContainer.querySelector('.banner-next');
         var prevBtn = bannerContainer.querySelector('.banner-prev');
         
         if (nextBtn) {
             nextBtn.addEventListener('click', function() {
-                nextBanner();
-                resetAutoSlide();
+                nextBanner('mobile');
+                resetAutoSlide('mobile');
             });
         }
         if (prevBtn) {
             prevBtn.addEventListener('click', function() {
-                prevBanner();
-                resetAutoSlide();
+                prevBanner('mobile');
+                resetAutoSlide('mobile');
             });
         }
         
@@ -1390,13 +1464,36 @@ document.addEventListener('DOMContentLoaded', function() {
         bannerContainer.addEventListener('touchend', function(e) {
             touchEndX = e.changedTouches[0].screenX;
             if (touchEndX < touchStartX - 50) {
-                nextBanner(); // Swipe left = next
+                nextBanner('mobile'); // Swipe left = next
             }
             if (touchEndX > touchStartX + 50) {
-                prevBanner(); // Swipe right = prev
+                prevBanner('mobile'); // Swipe right = prev
             }
-            startAutoSlide();
+            startAutoSlide('mobile');
         });
+    }
+    
+    // PC banner
+    var bannerContainerPc = document.getElementById('banner-carousel-pc');
+    if (bannerContainerPc) {
+        bannerContainerPc.addEventListener('mouseenter', stopAutoSlide);
+        bannerContainerPc.addEventListener('mouseleave', function() { startAutoSlide('pc'); });
+        
+        var nextBtnPc = bannerContainerPc.querySelector('.banner-next');
+        var prevBtnPc = bannerContainerPc.querySelector('.banner-prev');
+        
+        if (nextBtnPc) {
+            nextBtnPc.addEventListener('click', function() {
+                nextBanner('pc');
+                resetAutoSlide('pc');
+            });
+        }
+        if (prevBtnPc) {
+            prevBtnPc.addEventListener('click', function() {
+                prevBanner('pc');
+                resetAutoSlide('pc');
+            });
+        }
     }
 });
 
