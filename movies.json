@@ -325,6 +325,13 @@
           "shopeeLink": null
         },
         {
+          "ep": 2,
+          "embedUrl": "",
+          "videoUrl": "https://www.facebook.com/share/v/1Dc2kdwsrr/",
+          "uploadDate": "2025-12-21",
+          "shopeeLink": null
+        },
+        {
           "ep": 3,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w5ani",
           "videoUrl": "",
@@ -335,5 +342,5 @@
     }
   ],
   "banners": [],
-  "updated": "2025-12-22T02:15:05.911863"
+  "updated": "2025-12-22T02:25:49.269599"
 }
