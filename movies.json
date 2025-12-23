@@ -468,8 +468,89 @@
           "shopeeLink": null
         }
       ]
+    },
+    {
+      "name": "09.妈妈的完美伪装（60集）彭娜莎&邓欣豪",
+      "vietName": "09.妈妈的完美伪装（60集）彭娜莎&邓欣豪",
+      "summary": "",
+      "top": "",
+      "poster": "",
+      "year": "",
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w98c4",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w98c2",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        }
+      ]
+    },
+    {
+      "name": "03.九天玄女（69集）鲍李宁&张乐瑶",
+      "vietName": "03.九天玄女（69集）鲍李宁&张乐瑶",
+      "summary": "",
+      "top": "",
+      "poster": "",
+      "year": "",
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w9854",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w9856",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        }
+      ]
+    },
+    {
+      "name": "17.重生回夫君大婚时，她逆风翻盘第二季（68集）杨晨璐＆杨承翰＆陈云廷",
+      "vietName": "17.重生回夫君大婚时，她逆风翻盘第二季（68集）杨晨璐＆杨承翰＆陈云廷",
+      "summary": "",
+      "top": "",
+      "poster": "",
+      "year": "",
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w986g",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        },
+        {
+          "ep": 3,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w986i",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        }
+      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-23T08:37:39.860862"
+  "updated": "2025-12-23T08:58:47.416898"
 }
