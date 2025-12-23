@@ -535,6 +535,13 @@
       "allowPC": false,
       "episodes": [
         {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w986c",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        },
+        {
           "ep": 2,
           "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w986g",
           "videoUrl": "",
@@ -547,10 +554,17 @@
           "videoUrl": "",
           "uploadDate": "2025-12-23",
           "shopeeLink": null
+        },
+        {
+          "ep": 4,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w986e",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
         }
       ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-23T08:58:47.416898"
+  "updated": "2025-12-23T09:33:44.820099"
 }
