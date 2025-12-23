@@ -441,8 +441,35 @@
           "shopeeLink": null
         }
       ]
+    },
+    {
+      "name": "cotruong8tuoi",
+      "vietName": "Cơ Trưởng 8 Tuổi Cầm Lái Cứu Sống 147 Hành Khách Khiến Mẹ Ruột Hối Hận Khóc Ngất Đòi Tái Hợp",
+      "summary": "Trùng sinh về năm 8 tuổi để cứu cha! Vốn là một cơ trưởng huyền thoại, anh bất ngờ sống lại trong thân xác chính mình năm 8 tuổi - ngay trên chuyến bay tử thần năm xưa. Với kỹ năng lái máy bay thượng thừa trong hình hài một đứa trẻ, liệu cậu có thể viết lại lịch sử và cứu sống cả chuyến bay?",
+      "top": 14,
+      "poster": "https://i9.ytimg.com/vi_webp/n5f6VqoZn7w/maxresdefault.webp?v=69400119&sqp=CNT_p8oG&rs=AOn4CLAN2gaYVxZnpBRKuuPzBW_KGGyBCA",
+      "year": 2025,
+      "genre": "",
+      "country": "",
+      "allowPC": false,
+      "episodes": [
+        {
+          "ep": 1,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w8pty",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        },
+        {
+          "ep": 2,
+          "embedUrl": "https://geo.dailymotion.com/player.html?video=x9w8ptw",
+          "videoUrl": "",
+          "uploadDate": "2025-12-23",
+          "shopeeLink": null
+        }
+      ]
     }
   ],
   "banners": [],
-  "updated": "2025-12-23T02:53:14.393329"
+  "updated": "2025-12-23T03:45:58.012842"
 }
