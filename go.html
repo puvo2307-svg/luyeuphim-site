@@ -31,8 +31,7 @@
         // Hàm mở Shopee (ưu tiên app trên mobile)
         function openShopee(callback) {
             if (isMobile) {
-                // Thử mở app Shopee trước
-                var appLink = isIOS ? shopeeIOSLink : shopeeAndroidLink;
+                // Trên mobile: mở link web Shopee (sẽ tự động mở app nếu có)
                 var shopeeOpened = false;
                 
                 // Lắng nghe sự kiện khi trang bị ẩn (app đã mở)
@@ -43,32 +42,24 @@
                 };
                 document.addEventListener('visibilitychange', visibilityHandler);
                 
-                // Thử mở app Shopee
+                // Mở link web Shopee (sẽ tự mở app nếu có)
                 try {
-                    if (isIOS) {
-                        window.location.href = appLink;
-                    } else {
-                        window.location.href = appLink;
+                    var shopeeWindow = window.open(shopeeWebLink, '_blank');
+                    if (!shopeeWindow) {
+                        window.location.href = shopeeWebLink;
                     }
                 } catch(e) {
-                    // Nếu lỗi, sẽ fallback về web
+                    window.location.href = shopeeWebLink;
                 }
                 
-                // Nếu sau 1 giây trang vẫn visible (app không mở được), mở web
+                // Đợi đủ lâu để Shopee mở (app hoặc web)
                 setTimeout(function() {
                     document.removeEventListener('visibilitychange', visibilityHandler);
-                    if (!shopeeOpened && document.visibilityState === 'visible') {
-                        try {
-                            window.open(shopeeWebLink, '_blank');
-                        } catch(e) {
-                            window.location.href = shopeeWebLink;
-                        }
-                    }
-                    // Gọi callback sau khi Shopee đã mở (hoặc đã thử mở)
+                    // Sau khi Shopee đã mở, đợi thêm 800ms rồi mới mở YouTube
                     if (callback) {
-                        setTimeout(callback, 300);
+                        setTimeout(callback, 800);
                     }
-                }, 1000);
+                }, 1200);
             } else {
                 // PC: mở web Shopee
                 try {
@@ -76,7 +67,7 @@
                 } catch(e) {
                     window.location.href = shopeeWebLink;
                 }
-                // Gọi callback sau 300ms (giống logic cũ)
+                // PC: đợi 300ms rồi mở YouTube
                 if (callback) {
                     setTimeout(callback, 300);
                 }

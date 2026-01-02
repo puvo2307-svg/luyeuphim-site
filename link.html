@@ -107,9 +107,11 @@
         // Hàm mở Shopee (ưu tiên app trên mobile)
         function openShopee(callback) {
             if (isMobile) {
-                var appLink = isIOS ? shopeeIOSLink : shopeeAndroidLink;
+                // Trên mobile: mở link web Shopee (sẽ tự động mở app nếu có)
+                // Shopee web link sẽ tự redirect sang app nếu app đã cài
                 var shopeeOpened = false;
                 
+                // Lắng nghe sự kiện khi trang bị ẩn (app đã mở)
                 var visibilityHandler = function() {
                     if (document.hidden) {
                         shopeeOpened = true;
@@ -117,29 +119,37 @@
                 };
                 document.addEventListener('visibilitychange', visibilityHandler);
                 
+                // Mở link web Shopee (sẽ tự mở app nếu có)
                 try {
-                    window.location.href = appLink;
-                } catch(e) {}
+                    // Thử mở trong tab mới trước
+                    var shopeeWindow = window.open(shopeeWebLink, '_blank');
+                    if (!shopeeWindow) {
+                        // Nếu bị chặn popup, dùng location.href
+                        window.location.href = shopeeWebLink;
+                    }
+                } catch(e) {
+                    // Nếu lỗi, dùng location.href
+                    window.location.href = shopeeWebLink;
+                }
                 
+                // Đợi đủ lâu để Shopee mở (app hoặc web)
                 setTimeout(function() {
                     document.removeEventListener('visibilitychange', visibilityHandler);
-                    if (!shopeeOpened && document.visibilityState === 'visible') {
-                        try {
-                            window.open(shopeeWebLink, '_blank');
-                        } catch(e) {
-                            window.location.href = shopeeWebLink;
-                        }
-                    }
+                    
+                    // Sau khi Shopee đã mở (hoặc đã thử mở), đợi thêm 800ms rồi mới mở YouTube
+                    // Đảm bảo Shopee đã mở xong trước khi mở YouTube
                     if (callback) {
-                        setTimeout(callback, 300);
+                        setTimeout(callback, 800);
                     }
-                }, 1000);
+                }, 1200);
             } else {
+                // PC: mở web Shopee
                 try {
                     window.open(shopeeWebLink, '_blank');
                 } catch(e) {
                     window.location.href = shopeeWebLink;
                 }
+                // PC: đợi 300ms rồi mở YouTube
                 if (callback) {
                     setTimeout(callback, 300);
                 }
