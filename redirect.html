@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang chuyển hướng...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #121212;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+        }
+        .loading {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        .spinner {
+            border: 3px solid #333;
+            border-top: 3px solid #ee4d2d;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .message {
+            font-size: 14px;
+            color: #888;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="loading">Đang mở Shopee và YouTube...</div>
+        <div class="spinner"></div>
+        <div class="message">Vui lòng đợi trong giây lát...</div>
+    </div>
+
+    <script>
+        (function() {
+            // Link Shopee
+            var shopeeLink = "https://s.shopee.vn/9pXNbUiEFE";
+            
+            // Link YouTube channel
+            var youtubeLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+            
+            // Kiểm tra xem có phải user interaction không (một số trình duyệt chặn popup)
+            // Nếu không phải user interaction, thử redirect trực tiếp
+            
+            // Mở Shopee ngay lập tức
+            try {
+                var shopeeWindow = window.open(shopeeLink, '_blank');
+                if (!shopeeWindow) {
+                    // Nếu bị chặn popup, redirect trực tiếp
+                    window.location.href = shopeeLink;
+                }
+            } catch(e) {
+                // Fallback: redirect trực tiếp
+                window.location.href = shopeeLink;
+            }
+            
+            // Sau 300ms mở YouTube (giống logic trong index.html)
+            setTimeout(function() {
+                try {
+                    var youtubeWindow = window.open(youtubeLink, '_blank');
+                    if (!youtubeWindow) {
+                        // Nếu bị chặn, thử mở trong tab hiện tại sau khi Shopee đã mở
+                        setTimeout(function() {
+                            window.location.href = youtubeLink;
+                        }, 500);
+                    }
+                } catch(e) {
+                    // Fallback
+                    setTimeout(function() {
+                        window.location.href = youtubeLink;
+                    }, 500);
+                }
+            }, 300);
+            
+            // Đóng tab này sau 2 giây (nếu được phép)
+            setTimeout(function() {
+                try {
+                    window.close();
+                } catch(e) {
+                    // Không thể đóng tab (có thể do không phải window.open)
+                }
+            }, 2000);
+        })();
+    </script>
+</body>
+</html>
+

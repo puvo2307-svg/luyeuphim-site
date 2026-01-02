@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang chuyển hướng...</title>
+</head>
+<body>
+    <script>
+        // Link Shopee
+        var shopeeLink = "https://s.shopee.vn/9pXNbUiEFE";
+        
+        // Link YouTube channel  
+        var youtubeLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+        
+        // Mở Shopee ngay
+        window.open(shopeeLink, '_blank');
+        
+        // Sau 300ms mở YouTube (giống logic trong index.html)
+        setTimeout(function() {
+            window.open(youtubeLink, '_blank');
+        }, 300);
+        
+        // Redirect về trang chủ sau 1 giây
+        setTimeout(function() {
+            window.location.href = '/';
+        }, 1000);
+    </script>
+</body>
+</html>
+
