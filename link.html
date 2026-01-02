@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lu Yêu Phim - Xem phim miễn phí</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://puvo2307-svg.github.io/luyeuphim-site/link.html" />
+    <meta property="og:title" content="Lu Yêu Phim - Xem phim miễn phí" />
+    <meta property="og:description" content="Xem phim miễn phí, tổng hợp các bộ phim hay nhất. Click để xem ngay!" />
+    <meta property="og:image" content="https://www.xemfulltap.live/logo.png" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #ff5722 0%, #ee4d2d 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 8px 15px rgba(238, 77, 45, 0.4);
+            transition: transform 0.2s;
+            margin: 10px;
+        }
+        .btn:active {
+            transform: scale(0.95);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(238, 77, 45, 0.5);
+        }
+        .note {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Lu Yêu Phim</h1>
+        <p>Xem phim miễn phí, tổng hợp các bộ phim hay nhất</p>
+        <button class="btn" onclick="openLinks()">Xem Ngay</button>
+        <p class="note">Click nút trên để mở Shopee và YouTube</p>
+    </div>
+
+    <script>
+        // Link Shopee (web)
+        var shopeeWebLink = "https://s.shopee.vn/9pXNbUiEFE";
+        
+        // Deep link Shopee app
+        var shopeeIOSLink = "shopee://";
+        var shopeeAndroidLink = "com.shopee.vn://";
+        
+        // Link YouTube channel (web)
+        var youtubeWebLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+        
+        // Deep link YouTube app
+        var youtubeAppLink = "vnd.youtube://channel/UCb35SXg3vJeYP5povmGHA1A";
+        var youtubeIOSLink = "youtube://channel/UCb35SXg3vJeYP5povmGHA1A";
+        
+        // Phát hiện thiết bị
+        var ua = navigator.userAgent || navigator.vendor || window.opera;
+        var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        var isAndroid = /Android/.test(ua);
+        var isMobile = isIOS || isAndroid;
+        
+        // Hàm mở Shopee (ưu tiên app trên mobile)
+        function openShopee(callback) {
+            if (isMobile) {
+                var appLink = isIOS ? shopeeIOSLink : shopeeAndroidLink;
+                var shopeeOpened = false;
+                
+                var visibilityHandler = function() {
+                    if (document.hidden) {
+                        shopeeOpened = true;
+                    }
+                };
+                document.addEventListener('visibilitychange', visibilityHandler);
+                
+                try {
+                    window.location.href = appLink;
+                } catch(e) {}
+                
+                setTimeout(function() {
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    if (!shopeeOpened && document.visibilityState === 'visible') {
+                        try {
+                            window.open(shopeeWebLink, '_blank');
+                        } catch(e) {
+                            window.location.href = shopeeWebLink;
+                        }
+                    }
+                    if (callback) {
+                        setTimeout(callback, 300);
+                    }
+                }, 1000);
+            } else {
+                try {
+                    window.open(shopeeWebLink, '_blank');
+                } catch(e) {
+                    window.location.href = shopeeWebLink;
+                }
+                if (callback) {
+                    setTimeout(callback, 300);
+                }
+            }
+        }
+        
+        // Hàm mở YouTube (ưu tiên app trên mobile)
+        function openYouTube() {
+            if (isMobile) {
+                var appLink = isIOS ? youtubeIOSLink : youtubeAppLink;
+                var pageHidden = false;
+                
+                document.addEventListener('visibilitychange', function() {
+                    if (document.hidden) {
+                        pageHidden = true;
+                    }
+                });
+                
+                try {
+                    window.location.href = appLink;
+                } catch(e) {}
+                
+                setTimeout(function() {
+                    if (!pageHidden && document.visibilityState === 'visible') {
+                        try {
+                            window.open(youtubeWebLink, '_blank');
+                        } catch(e) {
+                            window.location.href = youtubeWebLink;
+                        }
+                    }
+                }, 800);
+            } else {
+                try {
+                    window.open(youtubeWebLink, '_blank');
+                } catch(e) {
+                    window.location.href = youtubeWebLink;
+                }
+            }
+        }
+        
+        // Hàm chính: mở Shopee trước, sau đó mở YouTube
+        function openLinks() {
+            openShopee(function() {
+                openYouTube();
+            });
+        }
+    </script>
+</body>
+</html>
+
