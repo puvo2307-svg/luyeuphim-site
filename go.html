@@ -7,8 +7,13 @@
 </head>
 <body>
     <script>
-        // Link Shopee
-        var shopeeLink = "https://s.shopee.vn/9pXNbUiEFE";
+        // Link Shopee (web)
+        var shopeeWebLink = "https://s.shopee.vn/9pXNbUiEFE";
+        
+        // Deep link Shopee app
+        var shopeeAppLink = "shopee://"; // Universal link cho Shopee
+        var shopeeIOSLink = "shopee://"; // iOS
+        var shopeeAndroidLink = "com.shopee.vn://"; // Android
         
         // Link YouTube channel (web)
         var youtubeWebLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
@@ -22,6 +27,61 @@
         var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
         var isAndroid = /Android/.test(ua);
         var isMobile = isIOS || isAndroid;
+        
+        // Hàm mở Shopee (ưu tiên app trên mobile)
+        function openShopee(callback) {
+            if (isMobile) {
+                // Thử mở app Shopee trước
+                var appLink = isIOS ? shopeeIOSLink : shopeeAndroidLink;
+                var shopeeOpened = false;
+                
+                // Lắng nghe sự kiện khi trang bị ẩn (app đã mở)
+                var visibilityHandler = function() {
+                    if (document.hidden) {
+                        shopeeOpened = true;
+                    }
+                };
+                document.addEventListener('visibilitychange', visibilityHandler);
+                
+                // Thử mở app Shopee
+                try {
+                    if (isIOS) {
+                        window.location.href = appLink;
+                    } else {
+                        window.location.href = appLink;
+                    }
+                } catch(e) {
+                    // Nếu lỗi, sẽ fallback về web
+                }
+                
+                // Nếu sau 1 giây trang vẫn visible (app không mở được), mở web
+                setTimeout(function() {
+                    document.removeEventListener('visibilitychange', visibilityHandler);
+                    if (!shopeeOpened && document.visibilityState === 'visible') {
+                        try {
+                            window.open(shopeeWebLink, '_blank');
+                        } catch(e) {
+                            window.location.href = shopeeWebLink;
+                        }
+                    }
+                    // Gọi callback sau khi Shopee đã mở (hoặc đã thử mở)
+                    if (callback) {
+                        setTimeout(callback, 300);
+                    }
+                }, 1000);
+            } else {
+                // PC: mở web Shopee
+                try {
+                    window.open(shopeeWebLink, '_blank');
+                } catch(e) {
+                    window.location.href = shopeeWebLink;
+                }
+                // Gọi callback sau 300ms (giống logic cũ)
+                if (callback) {
+                    setTimeout(callback, 300);
+                }
+            }
+        }
         
         // Hàm mở YouTube (ưu tiên app trên mobile)
         function openYouTube() {
@@ -39,11 +99,9 @@
                 
                 // Thử mở app
                 try {
-                    // Trên iOS, dùng location.href
                     if (isIOS) {
                         window.location.href = appLink;
                     } else {
-                        // Trên Android, thử cả location và window.open
                         window.location.href = appLink;
                     }
                 } catch(e) {
@@ -70,18 +128,16 @@
             }
         }
         
-        // Mở Shopee ngay
-        window.open(shopeeLink, '_blank');
-        
-        // Sau 300ms mở YouTube (giống logic trong index.html)
-        setTimeout(function() {
+        // Mở Shopee trước, sau đó mới mở YouTube
+        openShopee(function() {
+            // Callback: sau khi Shopee đã mở (hoặc đã thử mở), mới mở YouTube
             openYouTube();
-        }, 300);
+        });
         
-        // Redirect về trang chủ sau 1 giây
+        // Redirect về trang chủ sau 2 giây
         setTimeout(function() {
             window.location.href = '/';
-        }, 1000);
+        }, 2000);
     </script>
 </body>
 </html>
