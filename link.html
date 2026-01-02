@@ -48,18 +48,20 @@
         }
         .btn {
             display: inline-block;
-            padding: 15px 40px;
+            padding: 15px 25px;
             background: linear-gradient(135deg, #ff5722 0%, #ee4d2d 100%);
             color: white;
             text-decoration: none;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             border: none;
             box-shadow: 0 8px 15px rgba(238, 77, 45, 0.4);
             transition: transform 0.2s;
             margin: 10px;
+            line-height: 1.4;
+            max-width: 90%;
         }
         .btn:active {
             transform: scale(0.95);
@@ -79,8 +81,8 @@
     <div class="container">
         <h1>🎬 Lu Yêu Phim</h1>
         <p>Xem phim miễn phí, tổng hợp các bộ phim hay nhất</p>
-        <button class="btn" onclick="openLinks()">Xem Ngay</button>
-        <p class="note">Click nút trên để mở Shopee và YouTube</p>
+        <button class="btn" onclick="openLinks()">Ủng hộ = 1 click xem ngay qua Shopee và vào trực tiếp xem full</button>
+        <p class="note">Click nút trên để ủng hộ và xem phim</p>
     </div>
 
     <script>
@@ -120,28 +122,38 @@
                 document.addEventListener('visibilitychange', visibilityHandler);
                 
                 // Mở link web Shopee (sẽ tự mở app nếu có)
+                var shopeeWindow = null;
                 try {
                     // Thử mở trong tab mới trước
-                    var shopeeWindow = window.open(shopeeWebLink, '_blank');
-                    if (!shopeeWindow) {
-                        // Nếu bị chặn popup, dùng location.href
-                        window.location.href = shopeeWebLink;
-                    }
+                    shopeeWindow = window.open(shopeeWebLink, '_blank');
                 } catch(e) {
-                    // Nếu lỗi, dùng location.href
-                    window.location.href = shopeeWebLink;
+                    shopeeWindow = null;
                 }
                 
-                // Đợi đủ lâu để Shopee mở (app hoặc web)
+                // Nếu window.open không được (bị chặn popup), gọi callback ngay rồi mới redirect
+                if (!shopeeWindow) {
+                    // Gọi callback trước khi redirect để đảm bảo YouTube mở được
+                    if (callback) {
+                        // Gọi callback ngay, không đợi
+                        setTimeout(callback, 300);
+                    }
+                    // Sau đó mới redirect
+                    setTimeout(function() {
+                        window.location.href = shopeeWebLink;
+                    }, 100);
+                    return; // Thoát sớm
+                }
+                
+                // Nếu window.open thành công, đợi một chút rồi mở YouTube
                 setTimeout(function() {
                     document.removeEventListener('visibilitychange', visibilityHandler);
                     
-                    // Sau khi Shopee đã mở (hoặc đã thử mở), đợi thêm 800ms rồi mới mở YouTube
+                    // Sau khi Shopee đã mở (hoặc đã thử mở), đợi thêm 500ms rồi mới mở YouTube
                     // Đảm bảo Shopee đã mở xong trước khi mở YouTube
                     if (callback) {
-                        setTimeout(callback, 800);
+                        setTimeout(callback, 500);
                     }
-                }, 1200);
+                }, 1000);
             } else {
                 // PC: mở web Shopee
                 try {
@@ -159,19 +171,36 @@
         // Hàm mở YouTube (ưu tiên app trên mobile)
         function openYouTube() {
             if (isMobile) {
+                // Trên mobile: thử mở app YouTube trước
                 var appLink = isIOS ? youtubeIOSLink : youtubeAppLink;
                 var pageHidden = false;
                 
+                // Lắng nghe sự kiện khi trang bị ẩn (app đã mở)
                 document.addEventListener('visibilitychange', function() {
                     if (document.hidden) {
                         pageHidden = true;
                     }
                 });
                 
+                // Thử mở app YouTube
                 try {
-                    window.location.href = appLink;
-                } catch(e) {}
+                    // Thử window.open trước
+                    var youtubeWindow = window.open(appLink, '_blank');
+                    if (!youtubeWindow) {
+                        // Nếu không được, thử location.href
+                        window.location.href = appLink;
+                    }
+                } catch(e) {
+                    // Nếu lỗi, thử location.href
+                    try {
+                        window.location.href = appLink;
+                    } catch(e2) {
+                        // Nếu vẫn lỗi, mở web
+                        window.open(youtubeWebLink, '_blank');
+                    }
+                }
                 
+                // Nếu sau 1 giây trang vẫn visible (app không mở được), mở web YouTube
                 setTimeout(function() {
                     if (!pageHidden && document.visibilityState === 'visible') {
                         try {
@@ -180,8 +209,9 @@
                             window.location.href = youtubeWebLink;
                         }
                     }
-                }, 800);
+                }, 1000);
             } else {
+                // PC: mở web YouTube
                 try {
                     window.open(youtubeWebLink, '_blank');
                 } catch(e) {
