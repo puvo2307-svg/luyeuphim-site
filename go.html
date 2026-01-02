@@ -10,15 +10,72 @@
         // Link Shopee
         var shopeeLink = "https://s.shopee.vn/9pXNbUiEFE";
         
-        // Link YouTube channel  
-        var youtubeLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+        // Link YouTube channel (web)
+        var youtubeWebLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+        
+        // Deep link YouTube app
+        var youtubeAppLink = "vnd.youtube://channel/UCb35SXg3vJeYP5povmGHA1A";
+        var youtubeIOSLink = "youtube://channel/UCb35SXg3vJeYP5povmGHA1A";
+        
+        // Phát hiện thiết bị
+        var ua = navigator.userAgent || navigator.vendor || window.opera;
+        var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        var isAndroid = /Android/.test(ua);
+        var isMobile = isIOS || isAndroid;
+        
+        // Hàm mở YouTube (ưu tiên app trên mobile)
+        function openYouTube() {
+            if (isMobile) {
+                // Thử mở app trước
+                var appLink = isIOS ? youtubeIOSLink : youtubeAppLink;
+                var pageHidden = false;
+                
+                // Lắng nghe sự kiện khi trang bị ẩn (app đã mở)
+                document.addEventListener('visibilitychange', function() {
+                    if (document.hidden) {
+                        pageHidden = true;
+                    }
+                });
+                
+                // Thử mở app
+                try {
+                    // Trên iOS, dùng location.href
+                    if (isIOS) {
+                        window.location.href = appLink;
+                    } else {
+                        // Trên Android, thử cả location và window.open
+                        window.location.href = appLink;
+                    }
+                } catch(e) {
+                    // Nếu lỗi, sẽ fallback về web
+                }
+                
+                // Nếu sau 800ms trang vẫn visible (app không mở được), mở web
+                setTimeout(function() {
+                    if (!pageHidden && document.visibilityState === 'visible') {
+                        try {
+                            window.open(youtubeWebLink, '_blank');
+                        } catch(e) {
+                            window.location.href = youtubeWebLink;
+                        }
+                    }
+                }, 800);
+            } else {
+                // PC: mở web bình thường
+                try {
+                    window.open(youtubeWebLink, '_blank');
+                } catch(e) {
+                    window.location.href = youtubeWebLink;
+                }
+            }
+        }
         
         // Mở Shopee ngay
         window.open(shopeeLink, '_blank');
         
         // Sau 300ms mở YouTube (giống logic trong index.html)
         setTimeout(function() {
-            window.open(youtubeLink, '_blank');
+            openYouTube();
         }, 300);
         
         // Redirect về trang chủ sau 1 giây

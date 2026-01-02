@@ -60,40 +60,79 @@
             // Link Shopee
             var shopeeLink = "https://s.shopee.vn/9pXNbUiEFE";
             
-            // Link YouTube channel
-            var youtubeLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
+            // Link YouTube channel (web)
+            var youtubeWebLink = "https://youtube.com/channel/UCb35SXg3vJeYP5povmGHA1A?sub_confirmation=1";
             
-            // Kiểm tra xem có phải user interaction không (một số trình duyệt chặn popup)
-            // Nếu không phải user interaction, thử redirect trực tiếp
+            // Deep link YouTube app
+            var youtubeAppLink = "vnd.youtube://channel/UCb35SXg3vJeYP5povmGHA1A";
+            var youtubeIOSLink = "youtube://channel/UCb35SXg3vJeYP5povmGHA1A";
+            
+            // Phát hiện thiết bị
+            var ua = navigator.userAgent || navigator.vendor || window.opera;
+            var isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+            var isAndroid = /Android/.test(ua);
+            var isMobile = isIOS || isAndroid;
+            
+            // Hàm mở YouTube (ưu tiên app trên mobile)
+            function openYouTube() {
+                if (isMobile) {
+                    // Thử mở app trước
+                    var appLink = isIOS ? youtubeIOSLink : youtubeAppLink;
+                    var pageHidden = false;
+                    
+                    // Lắng nghe sự kiện khi trang bị ẩn (app đã mở)
+                    document.addEventListener('visibilitychange', function() {
+                        if (document.hidden) {
+                            pageHidden = true;
+                        }
+                    });
+                    
+                    // Thử mở app
+                    try {
+                        // Trên iOS, dùng location.href
+                        if (isIOS) {
+                            window.location.href = appLink;
+                        } else {
+                            // Trên Android, thử cả location và window.open
+                            window.location.href = appLink;
+                        }
+                    } catch(e) {
+                        // Nếu lỗi, sẽ fallback về web
+                    }
+                    
+                    // Nếu sau 800ms trang vẫn visible (app không mở được), mở web
+                    setTimeout(function() {
+                        if (!pageHidden && document.visibilityState === 'visible') {
+                            try {
+                                window.open(youtubeWebLink, '_blank');
+                            } catch(e) {
+                                window.location.href = youtubeWebLink;
+                            }
+                        }
+                    }, 800);
+                } else {
+                    // PC: mở web bình thường
+                    try {
+                        window.open(youtubeWebLink, '_blank');
+                    } catch(e) {
+                        window.location.href = youtubeWebLink;
+                    }
+                }
+            }
             
             // Mở Shopee ngay lập tức
             try {
                 var shopeeWindow = window.open(shopeeLink, '_blank');
                 if (!shopeeWindow) {
-                    // Nếu bị chặn popup, redirect trực tiếp
                     window.location.href = shopeeLink;
                 }
             } catch(e) {
-                // Fallback: redirect trực tiếp
                 window.location.href = shopeeLink;
             }
             
             // Sau 300ms mở YouTube (giống logic trong index.html)
             setTimeout(function() {
-                try {
-                    var youtubeWindow = window.open(youtubeLink, '_blank');
-                    if (!youtubeWindow) {
-                        // Nếu bị chặn, thử mở trong tab hiện tại sau khi Shopee đã mở
-                        setTimeout(function() {
-                            window.location.href = youtubeLink;
-                        }, 500);
-                    }
-                } catch(e) {
-                    // Fallback
-                    setTimeout(function() {
-                        window.location.href = youtubeLink;
-                    }, 500);
-                }
+                openYouTube();
             }, 300);
             
             // Đóng tab này sau 2 giây (nếu được phép)
@@ -101,7 +140,7 @@
                 try {
                     window.close();
                 } catch(e) {
-                    // Không thể đóng tab (có thể do không phải window.open)
+                    // Không thể đóng tab
                 }
             }, 2000);
         })();
